@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, BookOpen, Users, ClipboardList } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — TSU Result Portal" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — SCOE Result Portal" }] }),
   component: () => <ProtectedAdmin><DashboardPage /></ProtectedAdmin>,
 });
 

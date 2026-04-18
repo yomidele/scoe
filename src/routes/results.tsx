@@ -14,7 +14,7 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/results")({
-  head: () => ({ meta: [{ title: "View / Export Results — TSU" }] }),
+  head: () => ({ meta: [{ title: "View / Export Results — SCOE" }] }),
   component: () => <ProtectedAdmin><ResultsViewPage /></ProtectedAdmin>,
 });
 
@@ -148,7 +148,7 @@ function ResultsViewPage() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detailRows), "Result Sheet");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "GPA-CGPA Summary");
-    const fname = `TSU_Results_${sessionName.replace("/","-")}_${semester}_${level}L.xlsx`;
+    const fname = `SCOE_Results_${sessionName.replace("/","-")}_${semester}_${level}L.xlsx`;
     XLSX.writeFile(wb, fname);
     toast.success(`Exported ${fname}`);
   };
