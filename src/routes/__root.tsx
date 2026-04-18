@@ -9,8 +9,8 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "TSU Result Portal — Demo" },
-      { name: "description", content: "Taraba State University demo result management portal" },
+      { title: "SCOE Pambula Michika — Result Portal" },
+      { name: "description", content: "Shallom College of Education, Pambula Michika — demo result management portal" },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),

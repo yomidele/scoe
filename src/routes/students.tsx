@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/students")({
-  head: () => ({ meta: [{ title: "Students — TSU" }] }),
+  head: () => ({ meta: [{ title: "Students — SCOE" }] }),
   component: () => <ProtectedAdmin><StudentsPage /></ProtectedAdmin>,
 });
 
@@ -78,7 +78,7 @@ function StudentsPage() {
           <form onSubmit={(e) => { e.preventDefault(); addMut.mutate(); }} className="grid gap-3 md:grid-cols-4">
             <div className="space-y-1.5">
               <Label>Matric No</Label>
-              <Input placeholder="TSU/FED/EC/24/1001" value={matric} onChange={(e) => setMatric(e.target.value)} required />
+              <Input placeholder="SCOE/EDU/24/1001" value={matric} onChange={(e) => setMatric(e.target.value)} required />
             </div>
             <div className="space-y-1.5 md:col-span-2">
               <Label>Full name</Label>
