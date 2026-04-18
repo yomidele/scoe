@@ -57,7 +57,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <main className="min-w-0 flex-1">{children}</main>
       </div>
       <footer className="border-t border-border py-3 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Taraba State University — Demo build
+        © {new Date().getFullYear()} Shallom College of Education, Pambula Michika — Demo build
       </footer>
     </div>
   );
