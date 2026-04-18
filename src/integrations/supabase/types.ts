@@ -14,7 +14,139 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      academic_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      courses: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          level: number
+          semester: string
+          title: string
+          unit: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          level: number
+          semester: string
+          title: string
+          unit: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          level?: number
+          semester?: string
+          title?: string
+          unit?: number
+        }
+        Relationships: []
+      }
+      results: {
+        Row: {
+          ca_score: number
+          course_id: string
+          created_at: string
+          exam_score: number
+          id: string
+          level: number
+          semester: string
+          session_id: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          ca_score?: number
+          course_id: string
+          created_at?: string
+          exam_score?: number
+          id?: string
+          level: number
+          semester: string
+          session_id: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          ca_score?: number
+          course_id?: string
+          created_at?: string
+          exam_score?: number
+          id?: string
+          level?: number
+          semester?: string
+          session_id?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "results_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "results_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "academic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "results_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      students: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          level: number
+          matric_number: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          level: number
+          matric_number: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          level?: number
+          matric_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
