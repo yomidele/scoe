@@ -73,6 +73,7 @@ export type Database = {
           semester: string
           session_id: string
           student_id: string
+          total_score: number | null
           updated_at: string
         }
         Insert: {
@@ -85,6 +86,7 @@ export type Database = {
           semester: string
           session_id: string
           student_id: string
+          total_score?: number | null
           updated_at?: string
         }
         Update: {
@@ -97,6 +99,7 @@ export type Database = {
           semester?: string
           session_id?: string
           student_id?: string
+          total_score?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -126,6 +129,7 @@ export type Database = {
       students: {
         Row: {
           created_at: string
+          department: string | null
           full_name: string
           id: string
           level: number
@@ -133,6 +137,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          department?: string | null
           full_name: string
           id?: string
           level: number
@@ -140,6 +145,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          department?: string | null
           full_name?: string
           id?: string
           level?: number

@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { computeGrade, classOfDegree } from "@/lib/grading";
+import { computeGrade, classOfDegree, effectiveTotal } from "@/lib/grading";
 import { FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ interface ResultJoined {
   course_id: string;
   ca_score: number;
   exam_score: number;
+  total_score: number | null;
   semester: string;
   session_id: string;
   level: number;
@@ -51,7 +52,7 @@ function ResultsViewPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("results")
-        .select("id, student_id, course_id, session_id, level, semester, ca_score, exam_score, students(matric_number, full_name), courses(code, title, unit), academic_sessions(name)")
+        .select("id, student_id, course_id, session_id, level, semester, ca_score, exam_score, total_score, students(matric_number, full_name), courses(code, title, unit), academic_sessions(name)")
         .eq("session_id", sessionId)
         .eq("semester", semester)
         .eq("level", Number(level));
@@ -69,7 +70,7 @@ function ResultsViewPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("results")
-        .select("id, student_id, course_id, session_id, level, semester, ca_score, exam_score, courses(code, title, unit)")
+        .select("id, student_id, course_id, session_id, level, semester, ca_score, exam_score, total_score, courses(code, title, unit)")
         .in("student_id", studentIds);
       if (error) throw error;
       return (data ?? []) as unknown as ResultJoined[];
@@ -88,22 +89,20 @@ function ResultsViewPage() {
   }, [results]);
 
   const cgpaFor = (sid: string): { gpa: number; cgpa: number; tcu: number; tcp: number } => {
-    // GPA for current view (this session+sem+level)
     const cur = results.filter((r) => r.student_id === sid);
     let gpaPts = 0, gpaUnits = 0;
     for (const r of cur) {
       const u = r.courses?.unit ?? 0;
-      const { point } = computeGrade(Number(r.ca_score) + Number(r.exam_score));
+      const { point } = computeGrade(effectiveTotal(r));
       gpaPts += point * u; gpaUnits += u;
     }
     const gpa = gpaUnits ? gpaPts / gpaUnits : 0;
 
-    // CGPA across all history
     const hist = allHistory.filter((r) => r.student_id === sid);
     let cPts = 0, cUnits = 0;
     for (const r of hist) {
       const u = r.courses?.unit ?? 0;
-      const { point } = computeGrade(Number(r.ca_score) + Number(r.exam_score));
+      const { point } = computeGrade(effectiveTotal(r));
       cPts += point * u; cUnits += u;
     }
     const cgpa = cUnits ? cPts / cUnits : 0;
@@ -114,9 +113,8 @@ function ResultsViewPage() {
     if (grouped.length === 0) { toast.error("Nothing to export"); return; }
     const sessionName = sessions.find((s) => s.id === sessionId)?.name ?? "session";
 
-    // Sheet 1: detailed result rows
     const detailRows = results.map((r) => {
-      const total = Number(r.ca_score) + Number(r.exam_score);
+      const total = effectiveTotal(r);
       const { grade, point } = computeGrade(total);
       return {
         "Matric No": r.students?.matric_number ?? "",
@@ -246,7 +244,7 @@ function ResultsViewPage() {
                       </TableHeader>
                       <TableBody>
                         {info.rows.map((r) => {
-                          const total = Number(r.ca_score) + Number(r.exam_score);
+                          const total = effectiveTotal(r);
                           const g = computeGrade(total);
                           return (
                             <TableRow key={r.id}>
