@@ -27,6 +27,7 @@ interface ResultJoined {
   course_id: string;
   ca_score: number;
   exam_score: number;
+  total_score: number | null;
   semester: string;
   session_id: string;
   level: number;
