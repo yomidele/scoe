@@ -244,7 +244,7 @@ function ResultsViewPage() {
                       </TableHeader>
                       <TableBody>
                         {info.rows.map((r) => {
-                          const total = Number(r.ca_score) + Number(r.exam_score);
+                          const total = effectiveTotal(r);
                           const g = computeGrade(total);
                           return (
                             <TableRow key={r.id}>
