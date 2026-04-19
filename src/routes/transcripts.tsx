@@ -37,11 +37,11 @@ interface ResultRow {
 
 function TranscriptsPage() {
   const [search, setSearch] = useState("");
-  const [studentId, setStudentId] = useState("");
-  const [startSession, setStartSession] = useState("");
+  const [studentId, setStudentId] = useState<string | undefined>();
+  const [startSession, setStartSession] = useState<string | undefined>();
   const [startLevel, setStartLevel] = useState("100");
   const [startSem, setStartSem] = useState("First");
-  const [endSession, setEndSession] = useState("");
+  const [endSession, setEndSession] = useState<string | undefined>();
   const [endLevel, setEndLevel] = useState("400");
   const [endSem, setEndSem] = useState("Second");
 
@@ -69,7 +69,7 @@ function TranscriptsPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from("results")
         .select("id, level, semester, ca_score, exam_score, total_score, session_id, courses(code, title, unit), academic_sessions(name)")
-        .eq("student_id", studentId);
+        .eq("student_id", studentId!);
       if (error) throw error;
       return (data ?? []) as unknown as ResultRow[];
     },
@@ -278,7 +278,7 @@ function TranscriptsPage() {
 }
 
 function RangePicker({ session, setSession, level, setLevel, semester, setSemester, sessions }: {
-  session: string; setSession: (v: string) => void;
+  session: string | undefined; setSession: (v: string) => void;
   level: string; setLevel: (v: string) => void;
   semester: string; setSemester: (v: string) => void;
   sessions: { id: string; name: string }[];

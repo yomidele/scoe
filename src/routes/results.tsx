@@ -130,7 +130,6 @@ function ResultsViewPage() {
       };
     }).sort((a, b) => a["Matric No"].localeCompare(b["Matric No"]) || a["Course Code"].localeCompare(b["Course Code"]));
 
-    // Sheet 2: GPA / CGPA summary
     const summary = grouped.map(([sid, info]) => {
       const { gpa, cgpa } = cgpaFor(sid);
       return {
@@ -147,6 +146,127 @@ function ResultsViewPage() {
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(detailRows), "Result Sheet");
     XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summary), "GPA-CGPA Summary");
     const fname = `SCOE_Results_${sessionName.replace("/","-")}_${semester}_${level}L.xlsx`;
+    XLSX.writeFile(wb, fname);
+    toast.success(`Exported ${fname}`);
+  };
+
+  // Structured export: Student Info | Course grades | Current | Previous | Cumulative
+  const handleExportStructured = () => {
+    if (grouped.length === 0) { toast.error("Nothing to export"); return; }
+    const sessionName = sessions.find((s) => s.id === sessionId)?.name ?? "session";
+
+    const courseList = Array.from(
+      new Map(
+        results
+          .filter((r) => r.courses)
+          .map((r) => [r.course_id, { code: r.courses!.code, title: r.courses!.title, unit: r.courses!.unit }])
+      ).entries()
+    ).sort((a, b) => a[1].code.localeCompare(b[1].code));
+
+    const studentInfoCols = ["Matric No", "Student Name"];
+    const courseHeaders = courseList.map(([, c]) => `${c.code} (${c.unit}u)`);
+    const currentHeaders = ["RCU", "ECU", "GP", "GPA"];
+    const previousHeaders = ["TRCU (Prev)", "TECU (Prev)", "TGP (Prev)", "CGPA (Prev)"];
+    const cumulativeHeaders = ["TRCU (Cum)", "TECU (Cum)", "TGP (Cum)", "CGPA (Cum)"];
+
+    const bannerRow = [
+      ...studentInfoCols.map(() => ""),
+      ...courseHeaders.map((_, i) => (i === 0 ? "Course Grades" : "")),
+      ...currentHeaders.map((_, i) => (i === 0 ? "Current Semester" : "")),
+      ...previousHeaders.map((_, i) => (i === 0 ? "Previous Results" : "")),
+      ...cumulativeHeaders.map((_, i) => (i === 0 ? "Cumulative Results" : "")),
+    ];
+    const headerRow = [
+      ...studentInfoCols,
+      ...courseHeaders,
+      ...currentHeaders,
+      ...previousHeaders,
+      ...cumulativeHeaders,
+    ];
+
+    const dataRows = grouped.map(([sid, info]) => {
+      const currentByCourse = new Map<string, string>();
+      let rcu = 0, ecu = 0, gp = 0;
+      for (const r of info.rows) {
+        const u = r.courses?.unit ?? 0;
+        const total = effectiveTotal(r);
+        const { grade, point } = computeGrade(total);
+        currentByCourse.set(r.course_id, grade);
+        rcu += u;
+        if (grade !== "F") ecu += u;
+        gp += point * u;
+      }
+      const gpa = rcu ? gp / rcu : 0;
+
+      const currentIds = new Set(info.rows.map((r) => r.id));
+      const prev = allHistory.filter((r) => r.student_id === sid && !currentIds.has(r.id));
+      let trcuP = 0, tecuP = 0, tgpP = 0;
+      for (const r of prev) {
+        const u = r.courses?.unit ?? 0;
+        const total = effectiveTotal(r);
+        const { point, grade } = computeGrade(total);
+        trcuP += u;
+        if (grade !== "F") tecuP += u;
+        tgpP += point * u;
+      }
+      const cgpaP = trcuP ? tgpP / trcuP : 0;
+
+      const trcuC = trcuP + rcu;
+      const tecuC = tecuP + ecu;
+      const tgpC = tgpP + gp;
+      const cgpaC = trcuC ? tgpC / trcuC : 0;
+
+      const courseCells = courseList.map(([cid]) => currentByCourse.get(cid) ?? "");
+
+      return [
+        info.matric,
+        info.name,
+        ...courseCells,
+        rcu,
+        ecu,
+        Number(gp.toFixed(2)),
+        Number(gpa.toFixed(2)),
+        trcuP,
+        tecuP,
+        Number(tgpP.toFixed(2)),
+        trcuP ? Number(cgpaP.toFixed(2)) : 0,
+        trcuC,
+        tecuC,
+        Number(tgpC.toFixed(2)),
+        Number(cgpaC.toFixed(2)),
+      ];
+    });
+
+    const aoa = [bannerRow, headerRow, ...dataRows];
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+    const courseStart = studentInfoCols.length;
+    const courseEnd = courseStart + courseHeaders.length - 1;
+    const currentStart = courseEnd + 1;
+    const currentEnd = currentStart + currentHeaders.length - 1;
+    const prevStart = currentEnd + 1;
+    const prevEnd = prevStart + previousHeaders.length - 1;
+    const cumStart = prevEnd + 1;
+    const cumEnd = cumStart + cumulativeHeaders.length - 1;
+
+    ws["!merges"] = [
+      ...(courseHeaders.length > 1 ? [{ s: { r: 0, c: courseStart }, e: { r: 0, c: courseEnd } }] : []),
+      { s: { r: 0, c: currentStart }, e: { r: 0, c: currentEnd } },
+      { s: { r: 0, c: prevStart }, e: { r: 0, c: prevEnd } },
+      { s: { r: 0, c: cumStart }, e: { r: 0, c: cumEnd } },
+    ];
+
+    ws["!cols"] = [
+      { wch: 22 }, { wch: 28 },
+      ...courseHeaders.map(() => ({ wch: 12 })),
+      ...currentHeaders.map(() => ({ wch: 8 })),
+      ...previousHeaders.map(() => ({ wch: 12 })),
+      ...cumulativeHeaders.map(() => ({ wch: 12 })),
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, `${level}L ${semester} Sem`);
+    const fname = `SCOE_Structured_${sessionName.replace("/","-")}_${semester}_${level}L.xlsx`;
     XLSX.writeFile(wb, fname);
     toast.success(`Exported ${fname}`);
   };
@@ -184,9 +304,12 @@ function ResultsViewPage() {
               <SelectContent>{LEVELS.map((l) => <SelectItem key={l} value={String(l)}>{l} Level</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <div className="flex items-end">
-            <Button onClick={handleExport} className="w-full" disabled={grouped.length === 0}>
-              <FileSpreadsheet className="mr-2 h-4 w-4" /> Export to Excel
+          <div className="flex items-end gap-2">
+            <Button onClick={handleExport} variant="outline" className="flex-1" disabled={grouped.length === 0}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Basic Export
+            </Button>
+            <Button onClick={handleExportStructured} className="flex-1" disabled={grouped.length === 0}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Structured (Cur/Prev/Cum)
             </Button>
           </div>
         </CardContent>
