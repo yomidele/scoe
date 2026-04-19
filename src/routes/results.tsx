@@ -70,7 +70,7 @@ function ResultsViewPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("results")
-        .select("id, student_id, course_id, session_id, level, semester, ca_score, exam_score, courses(code, title, unit)")
+        .select("id, student_id, course_id, session_id, level, semester, ca_score, exam_score, total_score, courses(code, title, unit)")
         .in("student_id", studentIds);
       if (error) throw error;
       return (data ?? []) as unknown as ResultJoined[];
