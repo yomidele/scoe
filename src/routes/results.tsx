@@ -52,7 +52,7 @@ function ResultsViewPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("results")
-        .select("id, student_id, course_id, session_id, level, semester, ca_score, exam_score, students(matric_number, full_name), courses(code, title, unit), academic_sessions(name)")
+        .select("id, student_id, course_id, session_id, level, semester, ca_score, exam_score, total_score, students(matric_number, full_name), courses(code, title, unit), academic_sessions(name)")
         .eq("session_id", sessionId)
         .eq("semester", semester)
         .eq("level", Number(level));
