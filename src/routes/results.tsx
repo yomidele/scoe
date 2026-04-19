@@ -113,9 +113,8 @@ function ResultsViewPage() {
     if (grouped.length === 0) { toast.error("Nothing to export"); return; }
     const sessionName = sessions.find((s) => s.id === sessionId)?.name ?? "session";
 
-    // Sheet 1: detailed result rows
     const detailRows = results.map((r) => {
-      const total = Number(r.ca_score) + Number(r.exam_score);
+      const total = effectiveTotal(r);
       const { grade, point } = computeGrade(total);
       return {
         "Matric No": r.students?.matric_number ?? "",
