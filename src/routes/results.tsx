@@ -89,22 +89,20 @@ function ResultsViewPage() {
   }, [results]);
 
   const cgpaFor = (sid: string): { gpa: number; cgpa: number; tcu: number; tcp: number } => {
-    // GPA for current view (this session+sem+level)
     const cur = results.filter((r) => r.student_id === sid);
     let gpaPts = 0, gpaUnits = 0;
     for (const r of cur) {
       const u = r.courses?.unit ?? 0;
-      const { point } = computeGrade(Number(r.ca_score) + Number(r.exam_score));
+      const { point } = computeGrade(effectiveTotal(r));
       gpaPts += point * u; gpaUnits += u;
     }
     const gpa = gpaUnits ? gpaPts / gpaUnits : 0;
 
-    // CGPA across all history
     const hist = allHistory.filter((r) => r.student_id === sid);
     let cPts = 0, cUnits = 0;
     for (const r of hist) {
       const u = r.courses?.unit ?? 0;
-      const { point } = computeGrade(Number(r.ca_score) + Number(r.exam_score));
+      const { point } = computeGrade(effectiveTotal(r));
       cPts += point * u; cUnits += u;
     }
     const cgpa = cUnits ? cPts / cUnits : 0;
