@@ -304,9 +304,12 @@ function ResultsViewPage() {
               <SelectContent>{LEVELS.map((l) => <SelectItem key={l} value={String(l)}>{l} Level</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <div className="flex items-end">
-            <Button onClick={handleExport} className="w-full" disabled={grouped.length === 0}>
-              <FileSpreadsheet className="mr-2 h-4 w-4" /> Export to Excel
+          <div className="flex items-end gap-2">
+            <Button onClick={handleExport} variant="outline" className="flex-1" disabled={grouped.length === 0}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Basic Export
+            </Button>
+            <Button onClick={handleExportStructured} className="flex-1" disabled={grouped.length === 0}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Structured (Cur/Prev/Cum)
             </Button>
           </div>
         </CardContent>
