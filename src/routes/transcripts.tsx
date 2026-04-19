@@ -69,7 +69,7 @@ function TranscriptsPage() {
     queryFn: async () => {
       const { data, error } = await supabase.from("results")
         .select("id, level, semester, ca_score, exam_score, total_score, session_id, courses(code, title, unit), academic_sessions(name)")
-        .eq("student_id", studentId);
+        .eq("student_id", studentId!);
       if (error) throw error;
       return (data ?? []) as unknown as ResultRow[];
     },
@@ -278,7 +278,7 @@ function TranscriptsPage() {
 }
 
 function RangePicker({ session, setSession, level, setLevel, semester, setSemester, sessions }: {
-  session: string; setSession: (v: string) => void;
+  session: string | undefined; setSession: (v: string) => void;
   level: string; setLevel: (v: string) => void;
   semester: string; setSemester: (v: string) => void;
   sessions: { id: string; name: string }[];
