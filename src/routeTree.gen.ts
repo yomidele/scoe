@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as StudentsRouteImport } from './routes/students'
 import { Route as SessionsRouteImport } from './routes/sessions'
 import { Route as ResultsRouteImport } from './routes/results'
-import { Route as ResultEntryRouteImport } from './routes/result-entry'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CoursesRouteImport } from './routes/courses'
@@ -31,11 +30,6 @@ const SessionsRoute = SessionsRouteImport.update({
 const ResultsRoute = ResultsRouteImport.update({
   id: '/results',
   path: '/results',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResultEntryRoute = ResultEntryRouteImport.update({
-  id: '/result-entry',
-  path: '/result-entry',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -64,7 +58,6 @@ export interface FileRoutesByFullPath {
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/result-entry': typeof ResultEntryRoute
   '/results': typeof ResultsRoute
   '/sessions': typeof SessionsRoute
   '/students': typeof StudentsRoute
@@ -74,7 +67,6 @@ export interface FileRoutesByTo {
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/result-entry': typeof ResultEntryRoute
   '/results': typeof ResultsRoute
   '/sessions': typeof SessionsRoute
   '/students': typeof StudentsRoute
@@ -85,7 +77,6 @@ export interface FileRoutesById {
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
-  '/result-entry': typeof ResultEntryRoute
   '/results': typeof ResultsRoute
   '/sessions': typeof SessionsRoute
   '/students': typeof StudentsRoute
@@ -97,7 +88,6 @@ export interface FileRouteTypes {
     | '/courses'
     | '/dashboard'
     | '/login'
-    | '/result-entry'
     | '/results'
     | '/sessions'
     | '/students'
@@ -107,7 +97,6 @@ export interface FileRouteTypes {
     | '/courses'
     | '/dashboard'
     | '/login'
-    | '/result-entry'
     | '/results'
     | '/sessions'
     | '/students'
@@ -117,7 +106,6 @@ export interface FileRouteTypes {
     | '/courses'
     | '/dashboard'
     | '/login'
-    | '/result-entry'
     | '/results'
     | '/sessions'
     | '/students'
@@ -128,7 +116,6 @@ export interface RootRouteChildren {
   CoursesRoute: typeof CoursesRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
-  ResultEntryRoute: typeof ResultEntryRoute
   ResultsRoute: typeof ResultsRoute
   SessionsRoute: typeof SessionsRoute
   StudentsRoute: typeof StudentsRoute
@@ -155,13 +142,6 @@ declare module '@tanstack/react-router' {
       path: '/results'
       fullPath: '/results'
       preLoaderRoute: typeof ResultsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/result-entry': {
-      id: '/result-entry'
-      path: '/result-entry'
-      fullPath: '/result-entry'
-      preLoaderRoute: typeof ResultEntryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -200,7 +180,6 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesRoute: CoursesRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
-  ResultEntryRoute: ResultEntryRoute,
   ResultsRoute: ResultsRoute,
   SessionsRoute: SessionsRoute,
   StudentsRoute: StudentsRoute,
