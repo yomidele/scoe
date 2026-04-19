@@ -16,6 +16,15 @@ export interface ResultRow {
   ca: number;
   exam: number;
   unit: number;
+  total?: number | null;
+}
+
+/** Returns the effective total score for a result: prefers explicit total_score, else ca+exam. */
+export function effectiveTotal(r: { ca_score?: number | string | null; exam_score?: number | string | null; total_score?: number | string | null }): number {
+  if (r.total_score !== null && r.total_score !== undefined && r.total_score !== "") {
+    return Number(r.total_score);
+  }
+  return Number(r.ca_score ?? 0) + Number(r.exam_score ?? 0);
 }
 
 export function computeGPA(rows: ResultRow[]): number {
