@@ -37,11 +37,11 @@ interface ResultRow {
 
 function TranscriptsPage() {
   const [search, setSearch] = useState("");
-  const [studentId, setStudentId] = useState("");
-  const [startSession, setStartSession] = useState("");
+  const [studentId, setStudentId] = useState<string | undefined>();
+  const [startSession, setStartSession] = useState<string | undefined>();
   const [startLevel, setStartLevel] = useState("100");
   const [startSem, setStartSem] = useState("First");
-  const [endSession, setEndSession] = useState("");
+  const [endSession, setEndSession] = useState<string | undefined>();
   const [endLevel, setEndLevel] = useState("400");
   const [endSem, setEndSem] = useState("Second");
 
