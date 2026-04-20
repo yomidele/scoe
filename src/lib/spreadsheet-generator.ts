@@ -17,10 +17,16 @@ export interface HeaderConfig {
   academicSession: string; // e.g., "2025/2026"
 }
 
+export interface CourseCellData {
+  score: number | null;
+  grade: string | null;
+}
+
 export interface StudentResultData {
   matricNumber: string;
   studentName: string;
-  courseGrades: Record<string, string>; // courseCode -> grade
+  /** Map of courseCode -> { score, grade }. Cell renders as "score|grade". */
+  courseGrades: Record<string, CourseCellData | string>;
   currentSemester: {
     rcu: number; // Registered Course Units
     ecu: number; // Earned Course Units
