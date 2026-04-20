@@ -159,7 +159,7 @@ function TranscriptsPage() {
 
       autoTable(doc, {
         startY: y + 4,
-        head: [["Code", "Title", "Unit", "Score", "Grade", "Pt"]],
+        head: [["Code", "Title", "Unit", "Score", "Grade"]],
         body: g.rows
           .sort((a, b) => (a.courses?.code ?? "").localeCompare(b.courses?.code ?? ""))
           .map((r) => {
@@ -171,7 +171,6 @@ function TranscriptsPage() {
               String(r.courses?.unit ?? 0),
               String(total),
               gr.grade,
-              String(gr.point),
             ];
           }),
         styles: { fontSize: 9 },
