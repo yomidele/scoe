@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { LogIcon, Filter } from "lucide-react";
+import { LogsIcon as LogIcon, Filter } from "lucide-react";
 
 export const Route = createFileRoute("/audit-logs")({
   head: () => ({ meta: [{ title: "Audit Logs — SCOE" }] }),
