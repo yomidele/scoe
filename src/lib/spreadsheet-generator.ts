@@ -299,7 +299,7 @@ function buildHeaderRows(header: HeaderConfig): string[][] {
   const dynamicHeader = [
     header.department.toUpperCase(),
     header.program.toUpperCase(),
-    `${header.semester} ${header.level} LEVEL ${header.academicSession} ACADEMIC SESSION`,
+    `${header.semester} SEMESTER ${header.level} LEVEL ${header.academicSession} ACADEMIC SESSION`,
   ];
 
   dynamicHeader.forEach((line) => {
