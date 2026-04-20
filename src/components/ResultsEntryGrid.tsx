@@ -96,18 +96,28 @@ export function ResultsEntryGrid() {
     },
   });
 
-  // Fetch students at the selected level
+  // Fetch students at the selected level for the selected session
+  // ✅ CORRECT: Join with student_academic_records (session-specific level)
+  // ❌ NOT: Direct query on students.level
   const { data: levelStudents = [] } = useQuery({
-    queryKey: ["students-by-level", filters.level],
-    enabled: !!filters.level,
+    queryKey: ["students-by-session-level", filters.sessionId, filters.level],
+    enabled: !!filters.sessionId && !!filters.level,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("students")
-        .select("*")
+        .from("student_academic_records")
+        .select("students(id, matric_number, full_name)")
+        .eq("academic_session_id", filters.sessionId)
         .eq("level", Number(filters.level))
-        .order("matric_number");
+        .order("students(matric_number)");
       if (error) throw error;
-      return (data ?? []) as Student[];
+      
+      // Flatten the nested structure
+      return (data ?? []).map((record: any) => ({
+        id: record.students.id,
+        matric_number: record.students.matric_number,
+        full_name: record.students.full_name,
+        level: Number(filters.level),
+      })) as Student[];
     },
   });
 
