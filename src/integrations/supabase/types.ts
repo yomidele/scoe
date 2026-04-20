@@ -126,6 +126,54 @@ export type Database = {
           },
         ]
       }
+      student_academic_records: {
+        Row: {
+          academic_session_id: string
+          created_at: string
+          has_carryover: boolean
+          id: string
+          level: number
+          status: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          academic_session_id: string
+          created_at?: string
+          has_carryover?: boolean
+          id?: string
+          level: number
+          status?: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          academic_session_id?: string
+          created_at?: string
+          has_carryover?: boolean
+          id?: string
+          level?: number
+          status?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_academic_records_academic_session_id_fkey"
+            columns: ["academic_session_id"]
+            isOneToOne: false
+            referencedRelation: "academic_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "student_academic_records_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       students: {
         Row: {
           created_at: string
@@ -158,7 +206,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      promote_students_to_session: {
+        Args: { new_session_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

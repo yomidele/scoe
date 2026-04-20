@@ -31,10 +31,24 @@ function SessionsPage() {
 
   const addMut = useMutation({
     mutationFn: async (n: string) => {
-      const { error } = await supabase.from("academic_sessions").insert({ name: n });
+      const { data, error } = await supabase.from("academic_sessions").insert({ name: n }).select("id").single();
       if (error) throw error;
+      // Trigger has already populated student_academic_records — fetch counts
+      const { data: records } = await supabase
+        .from("student_academic_records")
+        .select("status")
+        .eq("academic_session_id", data!.id);
+      const promoted = (records ?? []).filter((r: any) => r.status === "active").length;
+      const carryovers = (records ?? []).filter((r: any) => r.status === "carryover").length;
+      return { promoted, carryovers };
     },
-    onSuccess: () => { toast.success("Session created"); setName(""); qc.invalidateQueries({ queryKey: ["sessions"] }); qc.invalidateQueries({ queryKey: ["count","academic_sessions"]}); },
+    onSuccess: ({ promoted, carryovers }) => {
+      toast.success(`Session created — ${promoted} promoted${carryovers ? `, ${carryovers} carryover` : ""}`);
+      setName("");
+      qc.invalidateQueries({ queryKey: ["sessions"] });
+      qc.invalidateQueries({ queryKey: ["count","academic_sessions"]});
+      qc.invalidateQueries({ queryKey: ["roster"] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
