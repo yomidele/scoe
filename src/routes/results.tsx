@@ -234,10 +234,14 @@ function ResultsViewPage() {
       const previousResults = calculatePreviousResults(previousCourses);
       const cumulative = calculateCumulative(currentSemester, previousResults);
 
-      // Build course grades map
-      const courseGrades: Record<string, string> = {};
-      for (const course of currentCourses) {
-        courseGrades[course.courseCode] = course.grade;
+      // Build course grades map: courseCode -> { score, grade }
+      const courseGrades: Record<string, { score: number | null; grade: string | null }> = {};
+      for (const r of info.rows) {
+        const code = r.courses?.code;
+        if (!code) continue;
+        const total = effectiveTotal(r);
+        const { grade } = computeGrade(total);
+        courseGrades[code] = { score: total, grade };
       }
 
       return {
