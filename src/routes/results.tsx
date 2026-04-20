@@ -405,36 +405,38 @@ function ResultsViewPage() {
 
       <Card className="tsu-shadow">
         <CardHeader><CardTitle className="text-base">Filters</CardTitle></CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-4">
-          <div className="space-y-1.5">
-            <Label>Session</Label>
-            <Select value={sessionId} onValueChange={setSessionId}>
-              <SelectTrigger><SelectValue placeholder={sessions.length ? "Select session" : "Create a session first"} /></SelectTrigger>
-              <SelectContent>{sessions.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
-            </Select>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label>Session</Label>
+              <Select value={sessionId} onValueChange={setSessionId}>
+                <SelectTrigger><SelectValue placeholder={sessions.length ? "Select session" : "Create a session first"} /></SelectTrigger>
+                <SelectContent>{sessions.map((s) => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Semester</Label>
+              <Select value={semester} onValueChange={setSemester}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{SEMESTERS.map((s) => <SelectItem key={s} value={s}>{s} Semester</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Level</Label>
+              <Select value={level} onValueChange={setLevel}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{LEVELS.map((l) => <SelectItem key={l} value={String(l)}>{l} Level</SelectItem>)}</SelectContent>
+              </Select>
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label>Semester</Label>
-            <Select value={semester} onValueChange={setSemester}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{SEMESTERS.map((s) => <SelectItem key={s} value={s}>{s} Semester</SelectItem>)}</SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-1.5">
-            <Label>Level</Label>
-            <Select value={level} onValueChange={setLevel}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>{LEVELS.map((l) => <SelectItem key={l} value={String(l)}>{l} Level</SelectItem>)}</SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-end gap-2">
-            <Button onClick={handleExport} variant="outline" className="flex-1" disabled={grouped.length === 0}>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <Button onClick={handleExport} variant="outline" disabled={grouped.length === 0} className="w-full">
               <FileSpreadsheet className="mr-2 h-4 w-4" /> Basic Export
             </Button>
-            <Button onClick={handleExportStructured} variant="outline" className="flex-1" disabled={grouped.length === 0}>
+            <Button onClick={handleExportStructured} variant="outline" disabled={grouped.length === 0} className="w-full">
               <FileSpreadsheet className="mr-2 h-4 w-4" /> Structured
             </Button>
-            <Button onClick={handleExportStandardizedFormat} className="flex-1" disabled={grouped.length === 0}>
+            <Button onClick={handleExportStandardizedFormat} disabled={grouped.length === 0} className="w-full">
               <FileSpreadsheet className="mr-2 h-4 w-4" /> Academic Format
             </Button>
           </div>
