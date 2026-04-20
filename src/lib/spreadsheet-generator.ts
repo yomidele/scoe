@@ -202,48 +202,48 @@ function createResultSheet(config: SpreadsheetConfig): XLSX.WorkSheet {
     a.code.localeCompare(b.code)
   );
 
-  // Build header rows
   const headerRows = buildHeaderRows(config.header);
 
-  // Column headers
   const studentInfoCols = ["Matric No", "Student Name"];
-  const courseHeaders = courseList.map((c) => `${c.code} (${c.units}u)`);
+  const courseCodes = courseList.map((c) => c.code);
+  const courseUnits = courseList.map((c) => c.units);
   const currentHeaders = ["RCU", "ECU", "GP", "GPA"];
   const previousHeaders = ["TRCU (Prev)", "TECU (Prev)", "TGP (Prev)", "CGPA (Prev)"];
   const cumulativeHeaders = ["TRCU (Cum)", "TECU (Cum)", "TGP (Cum)", "CGPA (Cum)"];
 
-  // Banner row for grouping
   const bannerRow = [
     ...studentInfoCols.map(() => ""),
-    ...courseHeaders.map((_, i) =>
-      i === 0 ? "COURSE GRADES" : ""
-    ),
-    ...currentHeaders.map((_, i) =>
-      i === 0 ? "CURRENT SEMESTER" : ""
-    ),
-    ...previousHeaders.map((_, i) =>
-      i === 0 ? "PREVIOUS RESULTS" : ""
-    ),
-    ...cumulativeHeaders.map((_, i) =>
-      i === 0 ? "CUMULATIVE RESULTS" : ""
-    ),
+    ...courseCodes.map((_, i) => (i === 0 ? "COURSE GRADES (Score|Grade)" : "")),
+    ...currentHeaders.map((_, i) => (i === 0 ? "CURRENT SEMESTER" : "")),
+    ...previousHeaders.map((_, i) => (i === 0 ? "PREVIOUS RESULTS" : "")),
+    ...cumulativeHeaders.map((_, i) => (i === 0 ? "CUMULATIVE RESULTS" : "")),
   ];
 
-  // Column header row
-  const headerRow = [
+  // Two-tier course header
+  const codesRow = [
     ...studentInfoCols,
-    ...courseHeaders,
+    ...courseCodes,
     ...currentHeaders,
     ...previousHeaders,
     ...cumulativeHeaders,
   ];
+  const unitsRow = [
+    ...studentInfoCols.map(() => ""),
+    ...courseUnits.map((u) => String(u)),
+    ...currentHeaders.map(() => ""),
+    ...previousHeaders.map(() => ""),
+    ...cumulativeHeaders.map(() => ""),
+  ];
 
-  // Data rows
+  const formatCell = (v: CourseCellData | string | undefined): string => {
+    if (v == null) return "";
+    if (typeof v === "string") return v;
+    if (v.score === null || v.score === undefined || !v.grade) return "";
+    return `${v.score}|${v.grade}`;
+  };
+
   const dataRows = config.students.map((student) => {
-    const courseCells = courseList.map(
-      (c) => student.courseGrades[c.code] ?? ""
-    );
-
+    const courseCells = courseList.map((c) => formatCell(student.courseGrades[c.code]));
     return [
       student.matricNumber,
       student.studentName,
@@ -263,22 +263,22 @@ function createResultSheet(config: SpreadsheetConfig): XLSX.WorkSheet {
     ];
   });
 
-  // Combine all rows
   const aoa = [
     ...headerRows,
     bannerRow,
-    headerRow,
+    codesRow,
+    unitsRow,
     ...dataRows,
   ];
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);
 
-  // Apply formatting
+  // Apply formatting (banner row index = headerRows.length; codes row +1; units row +2)
   formatSpreadsheet(
     ws,
-    headerRows.length,
+    headerRows.length + 1, // banner row index for merges
     studentInfoCols.length,
-    courseHeaders.length,
+    courseCodes.length,
     currentHeaders.length,
     previousHeaders.length,
     cumulativeHeaders.length
