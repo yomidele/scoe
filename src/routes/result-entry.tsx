@@ -67,22 +67,18 @@ function ResultEntryPage() {
     },
   });
 
-  // Roster for the selected session + level (active or carryover)
+  // Roster for the selected level (all students at that level, regardless of session)
   const { data: rosterStudents = [] } = useQuery({
-    queryKey: ["roster", form.sessionId, form.level],
-    enabled: !!form.sessionId && !!form.level,
+    queryKey: ["roster", form.level],
+    enabled: !!form.level,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("student_academic_records")
-        .select("status, students(id, matric_number, full_name, level)")
-        .eq("academic_session_id", form.sessionId)
+        .from("students")
+        .select("id, matric_number, full_name, level")
         .eq("level", Number(form.level))
-        .in("status", ["active", "carryover"]);
+        .order("matric_number");
       if (error) throw error;
-      return (data ?? [])
-        .map((r: any) => r.students ? { ...r.students, status: r.status } : null)
-        .filter(Boolean)
-        .sort((a: any, b: any) => a.matric_number.localeCompare(b.matric_number));
+      return data ?? [];
     },
   });
 
@@ -98,7 +94,7 @@ function ResultEntryPage() {
     },
   });
 
-  // Roster from student_academic_records is already filtered by session+level
+  // Students filtered by level only (session/semester apply only to result saving)
   const levelStudents = rosterStudents;
 
   // Derived state: current level courses (MEMOIZED, not useState)
@@ -356,11 +352,11 @@ function ResultEntryPage() {
                     </SelectTrigger>
                     <SelectContent>
                       {levelStudents.length === 0 && (
-                        <div className="px-2 py-3 text-sm text-muted-foreground">No students enrolled at this level for this session.</div>
+                        <div className="px-2 py-3 text-sm text-muted-foreground">No students found at this level.</div>
                       )}
                       {levelStudents.map((s: any) => (
                         <SelectItem key={s.id} value={s.id}>
-                          {s.matric_number} — {s.full_name}{s.status === "carryover" ? " (carryover)" : ""}
+                          {s.matric_number} — {s.full_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
