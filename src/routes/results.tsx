@@ -9,6 +9,17 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { computeGrade, classOfDegree, effectiveTotal } from "@/lib/grading";
+import {
+  generateSpreadsheet,
+  validateHeaderConfig,
+  calculateCurrentSemester,
+  calculatePreviousResults,
+  calculateCumulative,
+  generateFilename,
+  exportToExcel,
+  safeDivide,
+  formatDecimal,
+} from "@/lib/spreadsheet-generator";
 import { FileSpreadsheet } from "lucide-react";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
@@ -150,6 +161,114 @@ function ResultsViewPage() {
     toast.success(`Exported ${fname}`);
   };
 
+  // Standardized Academic Format Export - Uses spreadsheet-generator with strict header validation
+  const handleExportStandardizedFormat = () => {
+    if (grouped.length === 0) {
+      toast.error("Nothing to export");
+      return;
+    }
+
+    const sessionName = sessions.find((s) => s.id === sessionId)?.name ?? "unknown";
+
+    // Get course list sorted by code
+    const courseList = Array.from(
+      new Map(
+        results
+          .filter((r) => r.courses)
+          .map((r) => [
+            r.course_id,
+            { code: r.courses!.code, title: r.courses!.title, units: r.courses!.unit },
+          ])
+      ).entries()
+    )
+      .map(([, c]) => c)
+      .sort((a, b) => a.code.localeCompare(b.code));
+
+    // Demo: Social and Management Sciences - Department placeholder
+    // In production, this would come from a department selector/database
+    const headerConfig = {
+      department: "SOCIAL STUDIES EDUCATION", // Demo department
+      program: "B.Sc",
+      semester: (semester === "First" ? "FIRST" : "SECOND") as "FIRST" | "SECOND",
+      level: Number(level) as 100 | 200 | 300 | 400,
+      academicSession: sessionName, // e.g., "2025/2026"
+    };
+
+    // Validate header configuration
+    const validation = validateHeaderConfig(headerConfig);
+    if (!validation.isValid) {
+      toast.error(`Header validation failed:\n${validation.errors.join("\n")}`);
+      return;
+    }
+
+    // Build student data
+    const studentsData = grouped.map(([sid, info]) => {
+      const currentCourses = info.rows.map((r) => {
+        const total = effectiveTotal(r);
+        const { grade, point } = computeGrade(total);
+        return {
+          courseId: r.course_id,
+          courseCode: r.courses?.code ?? "",
+          units: r.courses?.unit ?? 0,
+          grade,
+          gradePoint: point,
+        };
+      });
+
+      const currentIds = new Set(info.rows.map((r) => r.id));
+      const previousCourses = allHistory
+        .filter((r) => r.student_id === sid && !currentIds.has(r.id))
+        .map((r) => {
+          const total = effectiveTotal(r);
+          const { grade, point } = computeGrade(total);
+          return {
+            courseId: r.course_id,
+            courseCode: r.courses?.code ?? "",
+            units: r.courses?.unit ?? 0,
+            grade,
+            gradePoint: point,
+          };
+        });
+
+      const currentSemester = calculateCurrentSemester(currentCourses);
+      const previousResults = calculatePreviousResults(previousCourses);
+      const cumulative = calculateCumulative(currentSemester, previousResults);
+
+      // Build course grades map
+      const courseGrades: Record<string, string> = {};
+      for (const course of currentCourses) {
+        courseGrades[course.courseCode] = course.grade;
+      }
+
+      return {
+        matricNumber: info.matric,
+        studentName: info.name,
+        courseGrades,
+        currentSemester,
+        previousResults,
+        cumulative,
+      };
+    });
+
+    try {
+      // Generate standardized workbook
+      const workbook = generateSpreadsheet({
+        header: headerConfig,
+        students: studentsData,
+        courseList,
+      });
+
+      // Export to file
+      const filename = generateFilename(sessionName, semester, Number(level));
+      exportToExcel(workbook, filename);
+      toast.success(`Exported standardized results: ${filename}`);
+    } catch (error) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Unknown error during export";
+      toast.error(`Export failed: ${errorMsg}`);
+    }
+  };
+
   // Structured export: Student Info | Course grades | Current | Previous | Cumulative
   const handleExportStructured = () => {
     if (grouped.length === 0) { toast.error("Nothing to export"); return; }
@@ -196,7 +315,7 @@ function ResultsViewPage() {
         if (grade !== "F") ecu += u;
         gp += point * u;
       }
-      const gpa = rcu ? gp / rcu : 0;
+      const gpa = safeDivide(gp, rcu);
 
       const currentIds = new Set(info.rows.map((r) => r.id));
       const prev = allHistory.filter((r) => r.student_id === sid && !currentIds.has(r.id));
@@ -209,12 +328,12 @@ function ResultsViewPage() {
         if (grade !== "F") tecuP += u;
         tgpP += point * u;
       }
-      const cgpaP = trcuP ? tgpP / trcuP : 0;
+      const cgpaP = safeDivide(tgpP, trcuP);
 
       const trcuC = trcuP + rcu;
       const tecuC = tecuP + ecu;
       const tgpC = tgpP + gp;
-      const cgpaC = trcuC ? tgpC / trcuC : 0;
+      const cgpaC = safeDivide(tgpC, trcuC);
 
       const courseCells = courseList.map(([cid]) => currentByCourse.get(cid) ?? "");
 
@@ -224,16 +343,16 @@ function ResultsViewPage() {
         ...courseCells,
         rcu,
         ecu,
-        Number(gp.toFixed(2)),
-        Number(gpa.toFixed(2)),
+        formatDecimal(gp),
+        gpa,
         trcuP,
         tecuP,
-        Number(tgpP.toFixed(2)),
-        trcuP ? Number(cgpaP.toFixed(2)) : 0,
+        formatDecimal(tgpP),
+        trcuP ? formatDecimal(cgpaP) : 0,
         trcuC,
         tecuC,
-        Number(tgpC.toFixed(2)),
-        Number(cgpaC.toFixed(2)),
+        formatDecimal(tgpC),
+        formatDecimal(cgpaC),
       ];
     });
 
@@ -308,8 +427,11 @@ function ResultsViewPage() {
             <Button onClick={handleExport} variant="outline" className="flex-1" disabled={grouped.length === 0}>
               <FileSpreadsheet className="mr-2 h-4 w-4" /> Basic Export
             </Button>
-            <Button onClick={handleExportStructured} className="flex-1" disabled={grouped.length === 0}>
-              <FileSpreadsheet className="mr-2 h-4 w-4" /> Structured (Cur/Prev/Cum)
+            <Button onClick={handleExportStructured} variant="outline" className="flex-1" disabled={grouped.length === 0}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Structured
+            </Button>
+            <Button onClick={handleExportStandardizedFormat} className="flex-1" disabled={grouped.length === 0}>
+              <FileSpreadsheet className="mr-2 h-4 w-4" /> Academic Format
             </Button>
           </div>
         </CardContent>

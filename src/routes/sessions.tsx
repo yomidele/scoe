@@ -76,30 +76,32 @@ function SessionsPage() {
       <Card className="tsu-shadow">
         <CardHeader><CardTitle className="text-base">Existing sessions</CardTitle></CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Session</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading && <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground">Loading…</TableCell></TableRow>}
-              {!isLoading && sessions.length === 0 && (
-                <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground">No sessions yet.</TableCell></TableRow>
-              )}
-              {sessions.map((s) => (
-                <TableRow key={s.id}>
-                  <TableCell className="font-medium">{s.name}</TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" variant="ghost" onClick={() => { if (confirm(`Delete session ${s.name}? Related results will be removed.`)) delMut.mutate(s.id); }}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Session</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {isLoading && <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground">Loading…</TableCell></TableRow>}
+                {!isLoading && sessions.length === 0 && (
+                  <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground">No sessions yet.</TableCell></TableRow>
+                )}
+                {sessions.map((s) => (
+                  <TableRow key={s.id}>
+                    <TableCell className="font-medium">{s.name}</TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="ghost" onClick={() => { if (confirm(`Delete session ${s.name}? Related results will be removed.`)) delMut.mutate(s.id); }}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

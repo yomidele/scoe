@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ValidationAuditRouteImport } from './routes/validation-audit'
 import { Route as TranscriptsRouteImport } from './routes/transcripts'
 import { Route as StudentsRouteImport } from './routes/students'
 import { Route as SessionsRouteImport } from './routes/sessions'
@@ -17,8 +18,14 @@ import { Route as ResultEntryRouteImport } from './routes/result-entry'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CoursesRouteImport } from './routes/courses'
+import { Route as AuditLogsRouteImport } from './routes/audit-logs'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ValidationAuditRoute = ValidationAuditRouteImport.update({
+  id: '/validation-audit',
+  path: '/validation-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TranscriptsRoute = TranscriptsRouteImport.update({
   id: '/transcripts',
   path: '/transcripts',
@@ -59,6 +66,11 @@ const CoursesRoute = CoursesRouteImport.update({
   path: '/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuditLogsRoute = AuditLogsRouteImport.update({
+  id: '/audit-logs',
+  path: '/audit-logs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -67,6 +79,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/audit-logs': typeof AuditLogsRoute
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -75,9 +88,11 @@ export interface FileRoutesByFullPath {
   '/sessions': typeof SessionsRoute
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
+  '/validation-audit': typeof ValidationAuditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/audit-logs': typeof AuditLogsRoute
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -86,10 +101,12 @@ export interface FileRoutesByTo {
   '/sessions': typeof SessionsRoute
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
+  '/validation-audit': typeof ValidationAuditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/audit-logs': typeof AuditLogsRoute
   '/courses': typeof CoursesRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
@@ -98,11 +115,13 @@ export interface FileRoutesById {
   '/sessions': typeof SessionsRoute
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
+  '/validation-audit': typeof ValidationAuditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/audit-logs'
     | '/courses'
     | '/dashboard'
     | '/login'
@@ -111,9 +130,11 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/students'
     | '/transcripts'
+    | '/validation-audit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/audit-logs'
     | '/courses'
     | '/dashboard'
     | '/login'
@@ -122,9 +143,11 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/students'
     | '/transcripts'
+    | '/validation-audit'
   id:
     | '__root__'
     | '/'
+    | '/audit-logs'
     | '/courses'
     | '/dashboard'
     | '/login'
@@ -133,10 +156,12 @@ export interface FileRouteTypes {
     | '/sessions'
     | '/students'
     | '/transcripts'
+    | '/validation-audit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuditLogsRoute: typeof AuditLogsRoute
   CoursesRoute: typeof CoursesRoute
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
@@ -145,10 +170,18 @@ export interface RootRouteChildren {
   SessionsRoute: typeof SessionsRoute
   StudentsRoute: typeof StudentsRoute
   TranscriptsRoute: typeof TranscriptsRoute
+  ValidationAuditRoute: typeof ValidationAuditRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/validation-audit': {
+      id: '/validation-audit'
+      path: '/validation-audit'
+      fullPath: '/validation-audit'
+      preLoaderRoute: typeof ValidationAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/transcripts': {
       id: '/transcripts'
       path: '/transcripts'
@@ -205,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/audit-logs': {
+      id: '/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/audit-logs'
+      preLoaderRoute: typeof AuditLogsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -217,6 +257,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuditLogsRoute: AuditLogsRoute,
   CoursesRoute: CoursesRoute,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
@@ -225,7 +266,17 @@ const rootRouteChildren: RootRouteChildren = {
   SessionsRoute: SessionsRoute,
   StudentsRoute: StudentsRoute,
   TranscriptsRoute: TranscriptsRoute,
+  ValidationAuditRoute: ValidationAuditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

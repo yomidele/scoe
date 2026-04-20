@@ -112,34 +112,36 @@ function StudentsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Matric No</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead className="text-center">Level</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">Loading…</TableCell></TableRow>}
-              {!isLoading && filtered.length === 0 && (
-                <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No students match.</TableCell></TableRow>
-              )}
-              {filtered.map((s) => (
-                <TableRow key={s.id}>
-                  <TableCell className="font-mono">{s.matric_number}</TableCell>
-                  <TableCell className="font-medium">{s.full_name}</TableCell>
-                  <TableCell className="text-center">{s.level}</TableCell>
-                  <TableCell className="text-right">
-                    <Button size="sm" variant="ghost" onClick={() => { if (confirm(`Delete ${s.full_name}? Related results will be removed.`)) delMut.mutate(s.id); }}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Matric No</TableHead>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="text-center">Level</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {isLoading && <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">Loading…</TableCell></TableRow>}
+                {!isLoading && filtered.length === 0 && (
+                  <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No students match.</TableCell></TableRow>
+                )}
+                {filtered.map((s) => (
+                  <TableRow key={s.id}>
+                    <TableCell className="font-mono">{s.matric_number}</TableCell>
+                    <TableCell className="font-medium">{s.full_name}</TableCell>
+                    <TableCell className="text-center">{s.level}</TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" variant="ghost" onClick={() => { if (confirm(`Delete ${s.full_name}? Related results will be removed.`)) delMut.mutate(s.id); }}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
