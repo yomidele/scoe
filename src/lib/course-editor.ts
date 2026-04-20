@@ -250,7 +250,7 @@ export async function editCourse(
 
     // Step 3: Determine what changed
     const changes: Record<string, { old: unknown; new: unknown }> = {};
-    const updateData: Record<string, unknown> = {};
+    const updateData: { code?: string; title?: string; unit?: number } = {};
 
     if (request.code !== undefined && request.code !== currentCourse.code) {
       changes.code = { old: currentCourse.code, new: request.code };
