@@ -67,15 +67,22 @@ function ResultEntryPage() {
     },
   });
 
-  const { data: students = [] } = useQuery({
-    queryKey: ["students"],
+  // Roster for the selected session + level (active or carryover)
+  const { data: rosterStudents = [] } = useQuery({
+    queryKey: ["roster", form.sessionId, form.level],
+    enabled: !!form.sessionId && !!form.level,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("students")
-        .select("*")
-        .order("matric_number");
+        .from("student_academic_records")
+        .select("status, students(id, matric_number, full_name, level)")
+        .eq("academic_session_id", form.sessionId)
+        .eq("level", Number(form.level))
+        .in("status", ["active", "carryover"]);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? [])
+        .map((r: any) => r.students ? { ...r.students, status: r.status } : null)
+        .filter(Boolean)
+        .sort((a: any, b: any) => a.matric_number.localeCompare(b.matric_number));
     },
   });
 
@@ -91,10 +98,8 @@ function ResultEntryPage() {
     },
   });
 
-  // Derived state: current level students (MEMOIZED, not useState)
-  const levelStudents = useMemo(() => {
-    return students.filter((s) => s.level === Number(form.level));
-  }, [students, form.level]);
+  // Roster from student_academic_records is already filtered by session+level
+  const levelStudents = rosterStudents;
 
   // Derived state: current level courses (MEMOIZED, not useState)
   const levelCourses = useMemo(() => {
@@ -350,9 +355,12 @@ function ResultEntryPage() {
                       <SelectValue placeholder="Select student" />
                     </SelectTrigger>
                     <SelectContent>
-                      {levelStudents.map((s) => (
+                      {levelStudents.length === 0 && (
+                        <div className="px-2 py-3 text-sm text-muted-foreground">No students enrolled at this level for this session.</div>
+                      )}
+                      {levelStudents.map((s: any) => (
                         <SelectItem key={s.id} value={s.id}>
-                          {s.matric_number} — {s.full_name}
+                          {s.matric_number} — {s.full_name}{s.status === "carryover" ? " (carryover)" : ""}
                         </SelectItem>
                       ))}
                     </SelectContent>
