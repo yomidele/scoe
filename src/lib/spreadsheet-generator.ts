@@ -1,6 +1,6 @@
 import ExcelJS from "exceljs";
-import scoeLogoUrl from "@/assets/scoe-logo.png";
-import tsuLogoUrl from "@/assets/tsu-logo.png";
+import scoeLogoUrl from "@/assets/scoe-logo.jpg";
+import tsuLogoUrl from "@/assets/tsu-logo.jpg";
 
 /**
  * Standardized academic spreadsheet generator for SCOE.
@@ -157,8 +157,8 @@ export async function generateSpreadsheet(config: SpreadsheetConfig): Promise<Ex
       fetchLogoBuffer(scoeLogoUrl),
       fetchLogoBuffer(tsuLogoUrl),
     ]);
-    const leftId = wb.addImage({ buffer: leftBuf as ExcelJS.Buffer, extension: "png" });
-    const rightId = wb.addImage({ buffer: rightBuf as ExcelJS.Buffer, extension: "png" });
+    const leftId = wb.addImage({ buffer: leftBuf as ExcelJS.Buffer, extension: "jpeg" });
+    const rightId = wb.addImage({ buffer: rightBuf as ExcelJS.Buffer, extension: "jpeg" });
     ws.addImage(leftId, {
       tl: { col: 0.05, row: 0.1 },
       ext: { width: 110, height: 130 },
