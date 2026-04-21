@@ -10,7 +10,9 @@ export default defineConfig({
   tanstackStart: {
     spa: {
       enabled: true,
+      prerender: { outputPath: "/index.html" },
     },
+    pages: [{ path: "/", prerender: { enabled: true, outputPath: "/index.html" } }],
   },
   vite: {
     build: {
