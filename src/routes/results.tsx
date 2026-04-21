@@ -162,7 +162,7 @@ function ResultsViewPage() {
   };
 
   // Standardized Academic Format Export - Uses spreadsheet-generator with strict header validation
-  const handleExportStandardizedFormat = () => {
+  const handleExportStandardizedFormat = async () => {
     if (grouped.length === 0) {
       toast.error("Nothing to export");
       return;
@@ -255,20 +255,16 @@ function ResultsViewPage() {
     });
 
     try {
-      // Generate standardized workbook
-      const workbook = generateSpreadsheet({
+      const workbook = await generateSpreadsheet({
         header: headerConfig,
         students: studentsData,
         courseList,
       });
-
-      // Export to file
       const filename = generateFilename(sessionName, semester, Number(level));
-      exportToExcel(workbook, filename);
+      await exportToExcel(workbook, filename);
       toast.success(`Exported standardized results: ${filename}`);
     } catch (error) {
-      const errorMsg =
-        error instanceof Error ? error.message : "Unknown error during export";
+      const errorMsg = error instanceof Error ? error.message : "Unknown error during export";
       toast.error(`Export failed: ${errorMsg}`);
     }
   };
