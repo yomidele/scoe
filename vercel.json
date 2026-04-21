@@ -2,6 +2,6 @@
   "buildCommand": "bun run build",
   "outputDirectory": "dist/client",
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/((?!assets/|favicon\\.ico).*)", "destination": "/index.html" }
   ]
 }

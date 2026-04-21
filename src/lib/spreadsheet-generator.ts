@@ -1,6 +1,6 @@
 import ExcelJS from "exceljs";
-import scoeLogoUrl from "@/assets/scoe-logo.png";
-import tsuLogoUrl from "@/assets/tsu-logo.png";
+import scoeLogoUrl from "@/assets/scoe-logo.jpg";
+import tsuLogoUrl from "@/assets/tsu-logo.jpg";
 
 /**
  * Standardized academic spreadsheet generator for SCOE.
@@ -120,42 +120,53 @@ export async function generateSpreadsheet(config: SpreadsheetConfig): Promise<Ex
     cumulativeHeaders.length;
 
   // ------------------------------------------------------------------
-  // HEADER BLOCK (rows 1-6) — logos on both sides + centered title block
+  // HEADER BLOCK (rows 1-6) — logos hugging the centered title block
   // ------------------------------------------------------------------
-  const headerLines = [
-    ...FIXED_HEADER,
-    config.header.department.toUpperCase(),
-    config.header.program.toUpperCase(),
-    `${config.header.semester} SEMESTER ${config.header.level} LEVEL ${config.header.academicSession} ACADEMIC SESSION`,
+  // Header lines + per-line font sizes (school name largest, then descending hierarchy)
+  const headerLines: Array<{ text: string; size: number }> = [
+    { text: FIXED_HEADER[0], size: 22 }, // SHALOM COLLEGE OF EDUCATION PAMBULA MICHIKA
+    { text: FIXED_HEADER[1], size: 12 }, // AN AFFILIATE OF TARABA STATE UNIVERSITY...
+    { text: FIXED_HEADER[2], size: 11 }, // FACULTY OF SOCIAL AND MANAGEMENT SCIENCES
+    { text: config.header.department.toUpperCase(), size: 11 },
+    { text: config.header.program.toUpperCase(), size: 10 },
+    {
+      text: `${config.header.semester} SEMESTER ${config.header.level} LEVEL ${config.header.academicSession} ACADEMIC SESSION`,
+      size: 10,
+    },
   ];
 
-  // Reserve column 1 for left logo and last column for right logo; merge centered title across the rest
+  // Reserve column 1 for left logo and last column for right logo;
+  // merge centered title across cols 2..(totalCols-1)
   for (let i = 0; i < headerLines.length; i++) {
     const row = ws.getRow(i + 1);
-    row.height = 22;
+    row.height = i === 0 ? 30 : 20;
     const cell = row.getCell(2);
-    cell.value = headerLines[i];
-    cell.font = { name: "Calibri", size: i < 3 ? 12 : 11, bold: true };
+    cell.value = headerLines[i].text;
+    cell.font = { name: "Calibri", size: headerLines[i].size, bold: true };
     cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
     ws.mergeCells(i + 1, 2, i + 1, totalCols - 1);
   }
 
-  // Embed logos (left in col 1, right in last col), spanning all 6 header rows
+  // Narrow the logo columns so logos sit visually close to the centered text
+  ws.getColumn(1).width = 14;
+  ws.getColumn(totalCols).width = 14;
+
+  // Embed logos hugging the title block (col 1 left, last col right), spanning all 6 header rows
   try {
     const [leftBuf, rightBuf] = await Promise.all([
       fetchLogoBuffer(scoeLogoUrl),
       fetchLogoBuffer(tsuLogoUrl),
     ]);
-    const leftId = wb.addImage({ buffer: leftBuf as ExcelJS.Buffer, extension: "png" });
-    const rightId = wb.addImage({ buffer: rightBuf as ExcelJS.Buffer, extension: "png" });
+    const leftId = wb.addImage({ buffer: leftBuf as ExcelJS.Buffer, extension: "jpeg" });
+    const rightId = wb.addImage({ buffer: rightBuf as ExcelJS.Buffer, extension: "jpeg" });
     ws.addImage(leftId, {
-      tl: { col: 0.1, row: 0.1 },
-      ext: { width: 90, height: 110 },
+      tl: { col: 0.05, row: 0.1 },
+      ext: { width: 110, height: 130 },
       editAs: "oneCell",
     });
     ws.addImage(rightId, {
-      tl: { col: totalCols - 1 + 0.1, row: 0.1 },
-      ext: { width: 90, height: 110 },
+      tl: { col: totalCols - 1 + 0.05, row: 0.5 },
+      ext: { width: 100, height: 100 },
       editAs: "oneCell",
     });
   } catch (err) {
