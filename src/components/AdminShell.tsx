@@ -25,6 +25,7 @@ const SUPER_ADMIN_NAV = [
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isSuperAdmin } = useRole();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
