@@ -59,8 +59,8 @@ function LoginPage() {
       <div className="flex flex-1 items-center justify-center px-4 py-10">
         <Card className="w-full max-w-md tsu-shadow">
           <CardHeader>
-            <CardTitle className="font-serif text-2xl">Administrator Sign In</CardTitle>
-            <CardDescription>Demo credentials are pre-filled. Click sign in to continue.</CardDescription>
+            <CardTitle className="font-serif text-2xl">Super Admin Sign In</CardTitle>
+            <CardDescription>University-wide administrator portal. Demo credentials are pre-filled.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignIn} className="space-y-4">
@@ -78,6 +78,10 @@ function LoginPage() {
               <p className="rounded-md bg-secondary p-3 text-xs text-secondary-foreground">
                 <strong>Demo account:</strong> {DEMO_EMAIL} / {DEMO_PASSWORD}
               </p>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <Link to="/faculty/login" className="hover:underline">Faculty Admin →</Link>
+                <Link to="/student/login" className="hover:underline">Student →</Link>
+              </div>
             </form>
           </CardContent>
         </Card>
