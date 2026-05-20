@@ -276,7 +276,7 @@ export type Database = {
           course_type?: string
           created_at?: string
           department_id?: string | null
-          faculty_id: string
+          faculty_id?: string
           id?: string
           level: number
           semester: string
@@ -434,7 +434,7 @@ export type Database = {
           created_at?: string
           department_id?: string | null
           exam_score?: number
-          faculty_id: string
+          faculty_id?: string
           id?: string
           level: number
           semester: string
@@ -570,9 +570,9 @@ export type Database = {
           created_at?: string
           date_of_birth?: string | null
           department?: string | null
-          department_id: string
+          department_id?: string
           email?: string | null
-          faculty_id: string
+          faculty_id?: string
           full_name: string
           gender?: string | null
           guardian_name?: string | null
