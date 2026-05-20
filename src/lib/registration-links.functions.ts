@@ -51,12 +51,25 @@ export const listRegistrationLinks = createServerFn({ method: "POST" })
     const scope = await getCallerScope(context.userId);
     let q = supabaseAdmin
       .from("registration_links")
-      .select("id, token, level, expires_at, used_at, created_at, faculty_id, department_id, faculties:faculty_id(name), departments:department_id(name)")
+      .select("id, token, level, expires_at, used_at, created_at, faculty_id, department_id")
       .order("created_at", { ascending: false });
     if (!scope.isSuper && scope.facultyId) q = q.eq("faculty_id", scope.facultyId);
     const { data, error } = await q;
     if (error) throw new Error(error.message);
-    return data ?? [];
+    const rows = data ?? [];
+    const facultyIds = [...new Set(rows.map((r) => r.faculty_id))];
+    const deptIds = [...new Set(rows.map((r) => r.department_id))];
+    const [{ data: facs }, { data: deps }] = await Promise.all([
+      facultyIds.length ? supabaseAdmin.from("faculties").select("id, name").in("id", facultyIds) : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+      deptIds.length ? supabaseAdmin.from("departments").select("id, name").in("id", deptIds) : Promise.resolve({ data: [] as { id: string; name: string }[] }),
+    ]);
+    const facMap = new Map((facs ?? []).map((f) => [f.id, f.name]));
+    const depMap = new Map((deps ?? []).map((d) => [d.id, d.name]));
+    return rows.map((r) => ({
+      ...r,
+      faculties: { name: facMap.get(r.faculty_id) ?? null },
+      departments: { name: depMap.get(r.department_id) ?? null },
+    }));
   });
 
 export const deleteRegistrationLink = createServerFn({ method: "POST" })
