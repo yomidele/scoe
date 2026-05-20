@@ -412,6 +412,63 @@ export type Database = {
           },
         ]
       }
+      matric_sequences: {
+        Row: {
+          department_id: string
+          last_seq: number
+          year_code: string
+        }
+        Insert: {
+          department_id: string
+          last_seq?: number
+          year_code: string
+        }
+        Update: {
+          department_id?: string
+          last_seq?: number
+          year_code?: string
+        }
+        Relationships: []
+      }
+      registration_links: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          department_id: string
+          expires_at: string
+          faculty_id: string
+          id: string
+          level: number
+          token: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          department_id: string
+          expires_at?: string
+          faculty_id: string
+          id?: string
+          level?: number
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          department_id?: string
+          expires_at?: string
+          faculty_id?: string
+          id?: string
+          level?: number
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
       results: {
         Row: {
           ca_score: number

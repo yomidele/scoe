@@ -20,14 +20,23 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as AuditLogsRouteImport } from './routes/audit-logs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StudentResultsRouteImport } from './routes/student.results'
+import { Route as StudentRegisterRouteImport } from './routes/student.register'
+import { Route as StudentProfileRouteImport } from './routes/student.profile'
 import { Route as StudentLoginRouteImport } from './routes/student.login'
+import { Route as StudentDashboardRouteImport } from './routes/student.dashboard'
+import { Route as StudentCoursesRouteImport } from './routes/student.courses'
+import { Route as StudentCarryoversRouteImport } from './routes/student.carryovers'
 import { Route as FacultyTranscriptsRouteImport } from './routes/faculty.transcripts'
 import { Route as FacultyStudentsRouteImport } from './routes/faculty.students'
 import { Route as FacultyResultsRouteImport } from './routes/faculty.results'
 import { Route as FacultyResultEntryRouteImport } from './routes/faculty.result-entry'
+import { Route as FacultyRegistrationLinksRouteImport } from './routes/faculty.registration-links'
 import { Route as FacultyLoginRouteImport } from './routes/faculty.login'
 import { Route as FacultyDashboardRouteImport } from './routes/faculty.dashboard'
 import { Route as FacultyCoursesRouteImport } from './routes/faculty.courses'
+import { Route as FacultyCarryoversRouteImport } from './routes/faculty.carryovers'
+import { Route as AdminRegistrationLinksRouteImport } from './routes/admin.registration-links'
 import { Route as AdminFacultyAdminsRouteImport } from './routes/admin.faculty-admins'
 import { Route as AdminFacultiesRouteImport } from './routes/admin.faculties'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -87,9 +96,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentResultsRoute = StudentResultsRouteImport.update({
+  id: '/student/results',
+  path: '/student/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentRegisterRoute = StudentRegisterRouteImport.update({
+  id: '/student/register',
+  path: '/student/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentProfileRoute = StudentProfileRouteImport.update({
+  id: '/student/profile',
+  path: '/student/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudentLoginRoute = StudentLoginRouteImport.update({
   id: '/student/login',
   path: '/student/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentDashboardRoute = StudentDashboardRouteImport.update({
+  id: '/student/dashboard',
+  path: '/student/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentCoursesRoute = StudentCoursesRouteImport.update({
+  id: '/student/courses',
+  path: '/student/courses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentCarryoversRoute = StudentCarryoversRouteImport.update({
+  id: '/student/carryovers',
+  path: '/student/carryovers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FacultyTranscriptsRoute = FacultyTranscriptsRouteImport.update({
@@ -112,6 +151,12 @@ const FacultyResultEntryRoute = FacultyResultEntryRouteImport.update({
   path: '/faculty/result-entry',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FacultyRegistrationLinksRoute =
+  FacultyRegistrationLinksRouteImport.update({
+    id: '/faculty/registration-links',
+    path: '/faculty/registration-links',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const FacultyLoginRoute = FacultyLoginRouteImport.update({
   id: '/faculty/login',
   path: '/faculty/login',
@@ -125,6 +170,16 @@ const FacultyDashboardRoute = FacultyDashboardRouteImport.update({
 const FacultyCoursesRoute = FacultyCoursesRouteImport.update({
   id: '/faculty/courses',
   path: '/faculty/courses',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacultyCarryoversRoute = FacultyCarryoversRouteImport.update({
+  id: '/faculty/carryovers',
+  path: '/faculty/carryovers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRegistrationLinksRoute = AdminRegistrationLinksRouteImport.update({
+  id: '/admin/registration-links',
+  path: '/admin/registration-links',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminFacultyAdminsRoute = AdminFacultyAdminsRouteImport.update({
@@ -158,14 +213,23 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/faculties': typeof AdminFacultiesRoute
   '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
+  '/admin/registration-links': typeof AdminRegistrationLinksRoute
+  '/faculty/carryovers': typeof FacultyCarryoversRoute
   '/faculty/courses': typeof FacultyCoursesRoute
   '/faculty/dashboard': typeof FacultyDashboardRoute
   '/faculty/login': typeof FacultyLoginRoute
+  '/faculty/registration-links': typeof FacultyRegistrationLinksRoute
   '/faculty/result-entry': typeof FacultyResultEntryRoute
   '/faculty/results': typeof FacultyResultsRoute
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
+  '/student/carryovers': typeof StudentCarryoversRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/dashboard': typeof StudentDashboardRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/profile': typeof StudentProfileRoute
+  '/student/register': typeof StudentRegisterRoute
+  '/student/results': typeof StudentResultsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -182,14 +246,23 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/faculties': typeof AdminFacultiesRoute
   '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
+  '/admin/registration-links': typeof AdminRegistrationLinksRoute
+  '/faculty/carryovers': typeof FacultyCarryoversRoute
   '/faculty/courses': typeof FacultyCoursesRoute
   '/faculty/dashboard': typeof FacultyDashboardRoute
   '/faculty/login': typeof FacultyLoginRoute
+  '/faculty/registration-links': typeof FacultyRegistrationLinksRoute
   '/faculty/result-entry': typeof FacultyResultEntryRoute
   '/faculty/results': typeof FacultyResultsRoute
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
+  '/student/carryovers': typeof StudentCarryoversRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/dashboard': typeof StudentDashboardRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/profile': typeof StudentProfileRoute
+  '/student/register': typeof StudentRegisterRoute
+  '/student/results': typeof StudentResultsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -207,14 +280,23 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/faculties': typeof AdminFacultiesRoute
   '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
+  '/admin/registration-links': typeof AdminRegistrationLinksRoute
+  '/faculty/carryovers': typeof FacultyCarryoversRoute
   '/faculty/courses': typeof FacultyCoursesRoute
   '/faculty/dashboard': typeof FacultyDashboardRoute
   '/faculty/login': typeof FacultyLoginRoute
+  '/faculty/registration-links': typeof FacultyRegistrationLinksRoute
   '/faculty/result-entry': typeof FacultyResultEntryRoute
   '/faculty/results': typeof FacultyResultsRoute
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
+  '/student/carryovers': typeof StudentCarryoversRoute
+  '/student/courses': typeof StudentCoursesRoute
+  '/student/dashboard': typeof StudentDashboardRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/profile': typeof StudentProfileRoute
+  '/student/register': typeof StudentRegisterRoute
+  '/student/results': typeof StudentResultsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -233,14 +315,23 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/faculties'
     | '/admin/faculty-admins'
+    | '/admin/registration-links'
+    | '/faculty/carryovers'
     | '/faculty/courses'
     | '/faculty/dashboard'
     | '/faculty/login'
+    | '/faculty/registration-links'
     | '/faculty/result-entry'
     | '/faculty/results'
     | '/faculty/students'
     | '/faculty/transcripts'
+    | '/student/carryovers'
+    | '/student/courses'
+    | '/student/dashboard'
     | '/student/login'
+    | '/student/profile'
+    | '/student/register'
+    | '/student/results'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -257,14 +348,23 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/faculties'
     | '/admin/faculty-admins'
+    | '/admin/registration-links'
+    | '/faculty/carryovers'
     | '/faculty/courses'
     | '/faculty/dashboard'
     | '/faculty/login'
+    | '/faculty/registration-links'
     | '/faculty/result-entry'
     | '/faculty/results'
     | '/faculty/students'
     | '/faculty/transcripts'
+    | '/student/carryovers'
+    | '/student/courses'
+    | '/student/dashboard'
     | '/student/login'
+    | '/student/profile'
+    | '/student/register'
+    | '/student/results'
   id:
     | '__root__'
     | '/'
@@ -281,14 +381,23 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/faculties'
     | '/admin/faculty-admins'
+    | '/admin/registration-links'
+    | '/faculty/carryovers'
     | '/faculty/courses'
     | '/faculty/dashboard'
     | '/faculty/login'
+    | '/faculty/registration-links'
     | '/faculty/result-entry'
     | '/faculty/results'
     | '/faculty/students'
     | '/faculty/transcripts'
+    | '/student/carryovers'
+    | '/student/courses'
+    | '/student/dashboard'
     | '/student/login'
+    | '/student/profile'
+    | '/student/register'
+    | '/student/results'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -306,14 +415,23 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminFacultiesRoute: typeof AdminFacultiesRoute
   AdminFacultyAdminsRoute: typeof AdminFacultyAdminsRoute
+  AdminRegistrationLinksRoute: typeof AdminRegistrationLinksRoute
+  FacultyCarryoversRoute: typeof FacultyCarryoversRoute
   FacultyCoursesRoute: typeof FacultyCoursesRoute
   FacultyDashboardRoute: typeof FacultyDashboardRoute
   FacultyLoginRoute: typeof FacultyLoginRoute
+  FacultyRegistrationLinksRoute: typeof FacultyRegistrationLinksRoute
   FacultyResultEntryRoute: typeof FacultyResultEntryRoute
   FacultyResultsRoute: typeof FacultyResultsRoute
   FacultyStudentsRoute: typeof FacultyStudentsRoute
   FacultyTranscriptsRoute: typeof FacultyTranscriptsRoute
+  StudentCarryoversRoute: typeof StudentCarryoversRoute
+  StudentCoursesRoute: typeof StudentCoursesRoute
+  StudentDashboardRoute: typeof StudentDashboardRoute
   StudentLoginRoute: typeof StudentLoginRoute
+  StudentProfileRoute: typeof StudentProfileRoute
+  StudentRegisterRoute: typeof StudentRegisterRoute
+  StudentResultsRoute: typeof StudentResultsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -395,11 +513,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/results': {
+      id: '/student/results'
+      path: '/student/results'
+      fullPath: '/student/results'
+      preLoaderRoute: typeof StudentResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/register': {
+      id: '/student/register'
+      path: '/student/register'
+      fullPath: '/student/register'
+      preLoaderRoute: typeof StudentRegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/profile': {
+      id: '/student/profile'
+      path: '/student/profile'
+      fullPath: '/student/profile'
+      preLoaderRoute: typeof StudentProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/student/login': {
       id: '/student/login'
       path: '/student/login'
       fullPath: '/student/login'
       preLoaderRoute: typeof StudentLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/dashboard': {
+      id: '/student/dashboard'
+      path: '/student/dashboard'
+      fullPath: '/student/dashboard'
+      preLoaderRoute: typeof StudentDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/courses': {
+      id: '/student/courses'
+      path: '/student/courses'
+      fullPath: '/student/courses'
+      preLoaderRoute: typeof StudentCoursesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/carryovers': {
+      id: '/student/carryovers'
+      path: '/student/carryovers'
+      fullPath: '/student/carryovers'
+      preLoaderRoute: typeof StudentCarryoversRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faculty/transcripts': {
@@ -430,6 +590,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacultyResultEntryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faculty/registration-links': {
+      id: '/faculty/registration-links'
+      path: '/faculty/registration-links'
+      fullPath: '/faculty/registration-links'
+      preLoaderRoute: typeof FacultyRegistrationLinksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/faculty/login': {
       id: '/faculty/login'
       path: '/faculty/login'
@@ -449,6 +616,20 @@ declare module '@tanstack/react-router' {
       path: '/faculty/courses'
       fullPath: '/faculty/courses'
       preLoaderRoute: typeof FacultyCoursesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faculty/carryovers': {
+      id: '/faculty/carryovers'
+      path: '/faculty/carryovers'
+      fullPath: '/faculty/carryovers'
+      preLoaderRoute: typeof FacultyCarryoversRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/registration-links': {
+      id: '/admin/registration-links'
+      path: '/admin/registration-links'
+      fullPath: '/admin/registration-links'
+      preLoaderRoute: typeof AdminRegistrationLinksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/faculty-admins': {
@@ -490,14 +671,23 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminFacultiesRoute: AdminFacultiesRoute,
   AdminFacultyAdminsRoute: AdminFacultyAdminsRoute,
+  AdminRegistrationLinksRoute: AdminRegistrationLinksRoute,
+  FacultyCarryoversRoute: FacultyCarryoversRoute,
   FacultyCoursesRoute: FacultyCoursesRoute,
   FacultyDashboardRoute: FacultyDashboardRoute,
   FacultyLoginRoute: FacultyLoginRoute,
+  FacultyRegistrationLinksRoute: FacultyRegistrationLinksRoute,
   FacultyResultEntryRoute: FacultyResultEntryRoute,
   FacultyResultsRoute: FacultyResultsRoute,
   FacultyStudentsRoute: FacultyStudentsRoute,
   FacultyTranscriptsRoute: FacultyTranscriptsRoute,
+  StudentCarryoversRoute: StudentCarryoversRoute,
+  StudentCoursesRoute: StudentCoursesRoute,
+  StudentDashboardRoute: StudentDashboardRoute,
   StudentLoginRoute: StudentLoginRoute,
+  StudentProfileRoute: StudentProfileRoute,
+  StudentRegisterRoute: StudentRegisterRoute,
+  StudentResultsRoute: StudentResultsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
