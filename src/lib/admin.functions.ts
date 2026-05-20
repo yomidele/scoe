@@ -59,7 +59,7 @@ export const createFacultyAdmin = createServerFn({ method: "POST" })
         phone: data.phone ?? null,
       });
       if (adminError) {
-        await supabaseAdmin.from("user_roles").delete().eq("user_id", userId).catch(() => {});
+        await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
         await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {});
         throw new Error(`Faculty admin insert failed: ${adminError.message}`);
       }
