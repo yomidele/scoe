@@ -22,6 +22,9 @@ import { Route as AuditLogsRouteImport } from './routes/audit-logs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudentLoginRouteImport } from './routes/student.login'
 import { Route as FacultyLoginRouteImport } from './routes/faculty.login'
+import { Route as AdminFacultyAdminsRouteImport } from './routes/admin.faculty-admins'
+import { Route as AdminFacultiesRouteImport } from './routes/admin.faculties'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 
 const ValidationAuditRoute = ValidationAuditRouteImport.update({
   id: '/validation-audit',
@@ -88,6 +91,21 @@ const FacultyLoginRoute = FacultyLoginRouteImport.update({
   path: '/faculty/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminFacultyAdminsRoute = AdminFacultyAdminsRouteImport.update({
+  id: '/admin/faculty-admins',
+  path: '/admin/faculty-admins',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminFacultiesRoute = AdminFacultiesRouteImport.update({
+  id: '/admin/faculties',
+  path: '/admin/faculties',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,6 +119,9 @@ export interface FileRoutesByFullPath {
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
   '/validation-audit': typeof ValidationAuditRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/faculties': typeof AdminFacultiesRoute
+  '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
   '/faculty/login': typeof FacultyLoginRoute
   '/student/login': typeof StudentLoginRoute
 }
@@ -116,6 +137,9 @@ export interface FileRoutesByTo {
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
   '/validation-audit': typeof ValidationAuditRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/faculties': typeof AdminFacultiesRoute
+  '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
   '/faculty/login': typeof FacultyLoginRoute
   '/student/login': typeof StudentLoginRoute
 }
@@ -132,6 +156,9 @@ export interface FileRoutesById {
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
   '/validation-audit': typeof ValidationAuditRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/faculties': typeof AdminFacultiesRoute
+  '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
   '/faculty/login': typeof FacultyLoginRoute
   '/student/login': typeof StudentLoginRoute
 }
@@ -149,6 +176,9 @@ export interface FileRouteTypes {
     | '/students'
     | '/transcripts'
     | '/validation-audit'
+    | '/admin/analytics'
+    | '/admin/faculties'
+    | '/admin/faculty-admins'
     | '/faculty/login'
     | '/student/login'
   fileRoutesByTo: FileRoutesByTo
@@ -164,6 +194,9 @@ export interface FileRouteTypes {
     | '/students'
     | '/transcripts'
     | '/validation-audit'
+    | '/admin/analytics'
+    | '/admin/faculties'
+    | '/admin/faculty-admins'
     | '/faculty/login'
     | '/student/login'
   id:
@@ -179,6 +212,9 @@ export interface FileRouteTypes {
     | '/students'
     | '/transcripts'
     | '/validation-audit'
+    | '/admin/analytics'
+    | '/admin/faculties'
+    | '/admin/faculty-admins'
     | '/faculty/login'
     | '/student/login'
   fileRoutesById: FileRoutesById
@@ -195,6 +231,9 @@ export interface RootRouteChildren {
   StudentsRoute: typeof StudentsRoute
   TranscriptsRoute: typeof TranscriptsRoute
   ValidationAuditRoute: typeof ValidationAuditRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminFacultiesRoute: typeof AdminFacultiesRoute
+  AdminFacultyAdminsRoute: typeof AdminFacultyAdminsRoute
   FacultyLoginRoute: typeof FacultyLoginRoute
   StudentLoginRoute: typeof StudentLoginRoute
 }
@@ -292,6 +331,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FacultyLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/faculty-admins': {
+      id: '/admin/faculty-admins'
+      path: '/admin/faculty-admins'
+      fullPath: '/admin/faculty-admins'
+      preLoaderRoute: typeof AdminFacultyAdminsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/faculties': {
+      id: '/admin/faculties'
+      path: '/admin/faculties'
+      fullPath: '/admin/faculties'
+      preLoaderRoute: typeof AdminFacultiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -307,6 +367,9 @@ const rootRouteChildren: RootRouteChildren = {
   StudentsRoute: StudentsRoute,
   TranscriptsRoute: TranscriptsRoute,
   ValidationAuditRoute: ValidationAuditRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminFacultiesRoute: AdminFacultiesRoute,
+  AdminFacultyAdminsRoute: AdminFacultyAdminsRoute,
   FacultyLoginRoute: FacultyLoginRoute,
   StudentLoginRoute: StudentLoginRoute,
 }

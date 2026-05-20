@@ -1,9 +1,10 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { TSUHeader } from "./TSUHeader";
-import { LayoutDashboard, CalendarDays, BookOpen, Users, ClipboardEdit, FileSpreadsheet, FileText, LogOut } from "lucide-react";
+import { LayoutDashboard, CalendarDays, BookOpen, Users, ClipboardEdit, FileSpreadsheet, FileText, LogOut, Building2, Shield, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRole } from "@/hooks/use-role";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -15,9 +16,16 @@ const NAV = [
   { to: "/transcripts", label: "Transcripts", icon: FileText },
 ] as const;
 
+const SUPER_ADMIN_NAV = [
+  { to: "/admin/faculties", label: "Faculties", icon: Building2 },
+  { to: "/admin/faculty-admins", label: "Faculty Admins", icon: Shield },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+] as const;
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { isSuperAdmin } = useRole();
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -48,6 +56,30 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </Link>
               );
             })}
+            {isSuperAdmin && (
+              <>
+                <div className="hidden md:block md:px-2 md:pt-3 md:pb-1 md:text-[10px] md:font-semibold md:uppercase md:tracking-wider md:text-muted-foreground">
+                  Super Admin
+                </div>
+                {SUPER_ADMIN_NAV.map(({ to, label, icon: Icon }) => {
+                  const active = location.pathname === to;
+                  return (
+                    <Link
+                      key={to}
+                      to={to}
+                      className={`flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="whitespace-nowrap">{label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            )}
             <div className="md:mt-auto md:pt-2">
               <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" /> Sign out
