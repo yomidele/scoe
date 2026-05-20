@@ -35,7 +35,7 @@ interface ResultRow {
   academic_sessions: { name: string } | null;
 }
 
-function TranscriptsPage() {
+export function TranscriptsPage() {
   const [search, setSearch] = useState("");
   const [studentId, setStudentId] = useState<string | undefined>();
   const [startSession, setStartSession] = useState<string | undefined>();

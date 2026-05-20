@@ -23,7 +23,7 @@ export const Route = createFileRoute("/courses")({
 const LEVELS = [100, 200, 300, 400] as const;
 const SEMESTERS = ["First", "Second"] as const;
 
-function CoursesPage() {
+export function CoursesPage() {
   const qc = useQueryClient();
   const [code, setCode] = useState("");
   const [title, setTitle] = useState("");

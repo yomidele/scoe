@@ -19,7 +19,7 @@ export const Route = createFileRoute("/students")({
 
 const LEVELS = [100, 200, 300, 400] as const;
 
-function StudentsPage() {
+export function StudentsPage() {
   const qc = useQueryClient();
   const [matric, setMatric] = useState("");
   const [name, setName] = useState("");

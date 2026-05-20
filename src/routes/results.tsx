@@ -47,7 +47,7 @@ interface ResultJoined {
   academic_sessions: { name: string } | null;
 }
 
-function ResultsViewPage() {
+export function ResultsViewPage() {
   const [sessionId, setSessionId] = useState("");
   const [semester, setSemester] = useState("First");
   const [level, setLevel] = useState("100");

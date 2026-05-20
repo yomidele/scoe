@@ -21,7 +21,13 @@ import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as AuditLogsRouteImport } from './routes/audit-logs'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudentLoginRouteImport } from './routes/student.login'
+import { Route as FacultyTranscriptsRouteImport } from './routes/faculty.transcripts'
+import { Route as FacultyStudentsRouteImport } from './routes/faculty.students'
+import { Route as FacultyResultsRouteImport } from './routes/faculty.results'
+import { Route as FacultyResultEntryRouteImport } from './routes/faculty.result-entry'
 import { Route as FacultyLoginRouteImport } from './routes/faculty.login'
+import { Route as FacultyDashboardRouteImport } from './routes/faculty.dashboard'
+import { Route as FacultyCoursesRouteImport } from './routes/faculty.courses'
 import { Route as AdminFacultyAdminsRouteImport } from './routes/admin.faculty-admins'
 import { Route as AdminFacultiesRouteImport } from './routes/admin.faculties'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -86,9 +92,39 @@ const StudentLoginRoute = StudentLoginRouteImport.update({
   path: '/student/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FacultyTranscriptsRoute = FacultyTranscriptsRouteImport.update({
+  id: '/faculty/transcripts',
+  path: '/faculty/transcripts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacultyStudentsRoute = FacultyStudentsRouteImport.update({
+  id: '/faculty/students',
+  path: '/faculty/students',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacultyResultsRoute = FacultyResultsRouteImport.update({
+  id: '/faculty/results',
+  path: '/faculty/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacultyResultEntryRoute = FacultyResultEntryRouteImport.update({
+  id: '/faculty/result-entry',
+  path: '/faculty/result-entry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FacultyLoginRoute = FacultyLoginRouteImport.update({
   id: '/faculty/login',
   path: '/faculty/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacultyDashboardRoute = FacultyDashboardRouteImport.update({
+  id: '/faculty/dashboard',
+  path: '/faculty/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FacultyCoursesRoute = FacultyCoursesRouteImport.update({
+  id: '/faculty/courses',
+  path: '/faculty/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminFacultyAdminsRoute = AdminFacultyAdminsRouteImport.update({
@@ -122,7 +158,13 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/faculties': typeof AdminFacultiesRoute
   '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
+  '/faculty/courses': typeof FacultyCoursesRoute
+  '/faculty/dashboard': typeof FacultyDashboardRoute
   '/faculty/login': typeof FacultyLoginRoute
+  '/faculty/result-entry': typeof FacultyResultEntryRoute
+  '/faculty/results': typeof FacultyResultsRoute
+  '/faculty/students': typeof FacultyStudentsRoute
+  '/faculty/transcripts': typeof FacultyTranscriptsRoute
   '/student/login': typeof StudentLoginRoute
 }
 export interface FileRoutesByTo {
@@ -140,7 +182,13 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/faculties': typeof AdminFacultiesRoute
   '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
+  '/faculty/courses': typeof FacultyCoursesRoute
+  '/faculty/dashboard': typeof FacultyDashboardRoute
   '/faculty/login': typeof FacultyLoginRoute
+  '/faculty/result-entry': typeof FacultyResultEntryRoute
+  '/faculty/results': typeof FacultyResultsRoute
+  '/faculty/students': typeof FacultyStudentsRoute
+  '/faculty/transcripts': typeof FacultyTranscriptsRoute
   '/student/login': typeof StudentLoginRoute
 }
 export interface FileRoutesById {
@@ -159,7 +207,13 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/faculties': typeof AdminFacultiesRoute
   '/admin/faculty-admins': typeof AdminFacultyAdminsRoute
+  '/faculty/courses': typeof FacultyCoursesRoute
+  '/faculty/dashboard': typeof FacultyDashboardRoute
   '/faculty/login': typeof FacultyLoginRoute
+  '/faculty/result-entry': typeof FacultyResultEntryRoute
+  '/faculty/results': typeof FacultyResultsRoute
+  '/faculty/students': typeof FacultyStudentsRoute
+  '/faculty/transcripts': typeof FacultyTranscriptsRoute
   '/student/login': typeof StudentLoginRoute
 }
 export interface FileRouteTypes {
@@ -179,7 +233,13 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/faculties'
     | '/admin/faculty-admins'
+    | '/faculty/courses'
+    | '/faculty/dashboard'
     | '/faculty/login'
+    | '/faculty/result-entry'
+    | '/faculty/results'
+    | '/faculty/students'
+    | '/faculty/transcripts'
     | '/student/login'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -197,7 +257,13 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/faculties'
     | '/admin/faculty-admins'
+    | '/faculty/courses'
+    | '/faculty/dashboard'
     | '/faculty/login'
+    | '/faculty/result-entry'
+    | '/faculty/results'
+    | '/faculty/students'
+    | '/faculty/transcripts'
     | '/student/login'
   id:
     | '__root__'
@@ -215,7 +281,13 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/faculties'
     | '/admin/faculty-admins'
+    | '/faculty/courses'
+    | '/faculty/dashboard'
     | '/faculty/login'
+    | '/faculty/result-entry'
+    | '/faculty/results'
+    | '/faculty/students'
+    | '/faculty/transcripts'
     | '/student/login'
   fileRoutesById: FileRoutesById
 }
@@ -234,7 +306,13 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminFacultiesRoute: typeof AdminFacultiesRoute
   AdminFacultyAdminsRoute: typeof AdminFacultyAdminsRoute
+  FacultyCoursesRoute: typeof FacultyCoursesRoute
+  FacultyDashboardRoute: typeof FacultyDashboardRoute
   FacultyLoginRoute: typeof FacultyLoginRoute
+  FacultyResultEntryRoute: typeof FacultyResultEntryRoute
+  FacultyResultsRoute: typeof FacultyResultsRoute
+  FacultyStudentsRoute: typeof FacultyStudentsRoute
+  FacultyTranscriptsRoute: typeof FacultyTranscriptsRoute
   StudentLoginRoute: typeof StudentLoginRoute
 }
 
@@ -324,11 +402,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faculty/transcripts': {
+      id: '/faculty/transcripts'
+      path: '/faculty/transcripts'
+      fullPath: '/faculty/transcripts'
+      preLoaderRoute: typeof FacultyTranscriptsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faculty/students': {
+      id: '/faculty/students'
+      path: '/faculty/students'
+      fullPath: '/faculty/students'
+      preLoaderRoute: typeof FacultyStudentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faculty/results': {
+      id: '/faculty/results'
+      path: '/faculty/results'
+      fullPath: '/faculty/results'
+      preLoaderRoute: typeof FacultyResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faculty/result-entry': {
+      id: '/faculty/result-entry'
+      path: '/faculty/result-entry'
+      fullPath: '/faculty/result-entry'
+      preLoaderRoute: typeof FacultyResultEntryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/faculty/login': {
       id: '/faculty/login'
       path: '/faculty/login'
       fullPath: '/faculty/login'
       preLoaderRoute: typeof FacultyLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faculty/dashboard': {
+      id: '/faculty/dashboard'
+      path: '/faculty/dashboard'
+      fullPath: '/faculty/dashboard'
+      preLoaderRoute: typeof FacultyDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faculty/courses': {
+      id: '/faculty/courses'
+      path: '/faculty/courses'
+      fullPath: '/faculty/courses'
+      preLoaderRoute: typeof FacultyCoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/faculty-admins': {
@@ -370,7 +490,13 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminFacultiesRoute: AdminFacultiesRoute,
   AdminFacultyAdminsRoute: AdminFacultyAdminsRoute,
+  FacultyCoursesRoute: FacultyCoursesRoute,
+  FacultyDashboardRoute: FacultyDashboardRoute,
   FacultyLoginRoute: FacultyLoginRoute,
+  FacultyResultEntryRoute: FacultyResultEntryRoute,
+  FacultyResultsRoute: FacultyResultsRoute,
+  FacultyStudentsRoute: FacultyStudentsRoute,
+  FacultyTranscriptsRoute: FacultyTranscriptsRoute,
   StudentLoginRoute: StudentLoginRoute,
 }
 export const routeTree = rootRouteImport
