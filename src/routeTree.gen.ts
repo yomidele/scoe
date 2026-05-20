@@ -20,6 +20,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as AuditLogsRouteImport } from './routes/audit-logs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StudentRegisterRouteImport } from './routes/student.register'
 import { Route as StudentLoginRouteImport } from './routes/student.login'
 import { Route as FacultyTranscriptsRouteImport } from './routes/faculty.transcripts'
 import { Route as FacultyStudentsRouteImport } from './routes/faculty.students'
@@ -85,6 +86,11 @@ const AuditLogsRoute = AuditLogsRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentRegisterRoute = StudentRegisterRouteImport.update({
+  id: '/student/register',
+  path: '/student/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudentLoginRoute = StudentLoginRouteImport.update({
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/register': typeof StudentRegisterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -190,6 +197,7 @@ export interface FileRoutesByTo {
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/register': typeof StudentRegisterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -215,6 +223,7 @@ export interface FileRoutesById {
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/register': typeof StudentRegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/faculty/students'
     | '/faculty/transcripts'
     | '/student/login'
+    | '/student/register'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/faculty/students'
     | '/faculty/transcripts'
     | '/student/login'
+    | '/student/register'
   id:
     | '__root__'
     | '/'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/faculty/students'
     | '/faculty/transcripts'
     | '/student/login'
+    | '/student/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -314,6 +326,7 @@ export interface RootRouteChildren {
   FacultyStudentsRoute: typeof FacultyStudentsRoute
   FacultyTranscriptsRoute: typeof FacultyTranscriptsRoute
   StudentLoginRoute: typeof StudentLoginRoute
+  StudentRegisterRoute: typeof StudentRegisterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -393,6 +406,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/register': {
+      id: '/student/register'
+      path: '/student/register'
+      fullPath: '/student/register'
+      preLoaderRoute: typeof StudentRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/student/login': {
@@ -498,7 +518,17 @@ const rootRouteChildren: RootRouteChildren = {
   FacultyStudentsRoute: FacultyStudentsRoute,
   FacultyTranscriptsRoute: FacultyTranscriptsRoute,
   StudentLoginRoute: StudentLoginRoute,
+  StudentRegisterRoute: StudentRegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { TSUHeader } from "@/components/TSUHeader";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuthSession } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { resolveMatricToEmail } from "@/lib/student-registration.functions";
 
 export const Route = createFileRoute("/student/login")({
   head: () => ({ meta: [{ title: "Student Sign In — SCOE" }] }),
@@ -21,25 +23,26 @@ function StudentLoginPage() {
   const [matric, setMatric] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const resolve = useServerFn(resolveMatricToEmail);
 
   useEffect(() => {
-    if (session) navigate({ to: "/dashboard" });
+    if (session) navigate({ to: "/student/dashboard" });
   }, [session, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      // Phase 1 placeholder: students sign in with email derived from matric.
-      // Phase 4 wires up real student registration + matric→email resolver.
-      const derivedEmail = `${matric.trim().toLowerCase().replace(/[^a-z0-9]/g, "")}@students.scoe.local`;
-      const { error } = await supabase.auth.signInWithPassword({ email: derivedEmail, password });
+      const { email } = await resolve({ data: { matric_number: matric.trim() } });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast.error("Student portal is not yet open. Registration will be available soon.");
+        toast.error(error.message);
         return;
       }
       toast.success("Welcome back");
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/student/dashboard" });
+    } catch (e) {
+      toast.error((e as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -52,13 +55,13 @@ function StudentLoginPage() {
         <Card className="w-full max-w-md tsu-shadow">
           <CardHeader>
             <CardTitle className="font-serif text-2xl">Student Sign In</CardTitle>
-            <CardDescription>Enter your matric number and password to access your portal.</CardDescription>
+            <CardDescription>Enter your matric number and password.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="matric">Matric Number</Label>
-                <Input id="matric" value={matric} onChange={(e) => setMatric(e.target.value)} placeholder="CSC/2026/00124" required />
+                <Input id="matric" value={matric} onChange={(e) => setMatric(e.target.value)} placeholder="SOC/26/0001" required />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
@@ -71,6 +74,9 @@ function StudentLoginPage() {
                 <Link to="/faculty/login" className="hover:underline">Faculty Admin →</Link>
                 <Link to="/login" className="hover:underline">Super Admin →</Link>
               </div>
+              <p className="text-center text-xs text-muted-foreground">
+                Need an account? Use the registration link from your Faculty Admin.
+              </p>
             </form>
           </CardContent>
         </Card>
