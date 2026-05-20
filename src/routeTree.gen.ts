@@ -20,8 +20,12 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as AuditLogsRouteImport } from './routes/audit-logs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StudentResultsRouteImport } from './routes/student.results'
 import { Route as StudentRegisterRouteImport } from './routes/student.register'
+import { Route as StudentProfileRouteImport } from './routes/student.profile'
 import { Route as StudentLoginRouteImport } from './routes/student.login'
+import { Route as StudentDashboardRouteImport } from './routes/student.dashboard'
+import { Route as StudentCarryoversRouteImport } from './routes/student.carryovers'
 import { Route as FacultyTranscriptsRouteImport } from './routes/faculty.transcripts'
 import { Route as FacultyStudentsRouteImport } from './routes/faculty.students'
 import { Route as FacultyResultsRouteImport } from './routes/faculty.results'
@@ -88,14 +92,34 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentResultsRoute = StudentResultsRouteImport.update({
+  id: '/student/results',
+  path: '/student/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudentRegisterRoute = StudentRegisterRouteImport.update({
   id: '/student/register',
   path: '/student/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudentProfileRoute = StudentProfileRouteImport.update({
+  id: '/student/profile',
+  path: '/student/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudentLoginRoute = StudentLoginRouteImport.update({
   id: '/student/login',
   path: '/student/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentDashboardRoute = StudentDashboardRouteImport.update({
+  id: '/student/dashboard',
+  path: '/student/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentCarryoversRoute = StudentCarryoversRouteImport.update({
+  id: '/student/carryovers',
+  path: '/student/carryovers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FacultyTranscriptsRoute = FacultyTranscriptsRouteImport.update({
@@ -171,8 +195,12 @@ export interface FileRoutesByFullPath {
   '/faculty/results': typeof FacultyResultsRoute
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
+  '/student/carryovers': typeof StudentCarryoversRoute
+  '/student/dashboard': typeof StudentDashboardRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/profile': typeof StudentProfileRoute
   '/student/register': typeof StudentRegisterRoute
+  '/student/results': typeof StudentResultsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -196,8 +224,12 @@ export interface FileRoutesByTo {
   '/faculty/results': typeof FacultyResultsRoute
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
+  '/student/carryovers': typeof StudentCarryoversRoute
+  '/student/dashboard': typeof StudentDashboardRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/profile': typeof StudentProfileRoute
   '/student/register': typeof StudentRegisterRoute
+  '/student/results': typeof StudentResultsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -222,8 +254,12 @@ export interface FileRoutesById {
   '/faculty/results': typeof FacultyResultsRoute
   '/faculty/students': typeof FacultyStudentsRoute
   '/faculty/transcripts': typeof FacultyTranscriptsRoute
+  '/student/carryovers': typeof StudentCarryoversRoute
+  '/student/dashboard': typeof StudentDashboardRoute
   '/student/login': typeof StudentLoginRoute
+  '/student/profile': typeof StudentProfileRoute
   '/student/register': typeof StudentRegisterRoute
+  '/student/results': typeof StudentResultsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -249,8 +285,12 @@ export interface FileRouteTypes {
     | '/faculty/results'
     | '/faculty/students'
     | '/faculty/transcripts'
+    | '/student/carryovers'
+    | '/student/dashboard'
     | '/student/login'
+    | '/student/profile'
     | '/student/register'
+    | '/student/results'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -274,8 +314,12 @@ export interface FileRouteTypes {
     | '/faculty/results'
     | '/faculty/students'
     | '/faculty/transcripts'
+    | '/student/carryovers'
+    | '/student/dashboard'
     | '/student/login'
+    | '/student/profile'
     | '/student/register'
+    | '/student/results'
   id:
     | '__root__'
     | '/'
@@ -299,8 +343,12 @@ export interface FileRouteTypes {
     | '/faculty/results'
     | '/faculty/students'
     | '/faculty/transcripts'
+    | '/student/carryovers'
+    | '/student/dashboard'
     | '/student/login'
+    | '/student/profile'
     | '/student/register'
+    | '/student/results'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -325,8 +373,12 @@ export interface RootRouteChildren {
   FacultyResultsRoute: typeof FacultyResultsRoute
   FacultyStudentsRoute: typeof FacultyStudentsRoute
   FacultyTranscriptsRoute: typeof FacultyTranscriptsRoute
+  StudentCarryoversRoute: typeof StudentCarryoversRoute
+  StudentDashboardRoute: typeof StudentDashboardRoute
   StudentLoginRoute: typeof StudentLoginRoute
+  StudentProfileRoute: typeof StudentProfileRoute
   StudentRegisterRoute: typeof StudentRegisterRoute
+  StudentResultsRoute: typeof StudentResultsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -408,6 +460,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/results': {
+      id: '/student/results'
+      path: '/student/results'
+      fullPath: '/student/results'
+      preLoaderRoute: typeof StudentResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/student/register': {
       id: '/student/register'
       path: '/student/register'
@@ -415,11 +474,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/student/profile': {
+      id: '/student/profile'
+      path: '/student/profile'
+      fullPath: '/student/profile'
+      preLoaderRoute: typeof StudentProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/student/login': {
       id: '/student/login'
       path: '/student/login'
       fullPath: '/student/login'
       preLoaderRoute: typeof StudentLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/dashboard': {
+      id: '/student/dashboard'
+      path: '/student/dashboard'
+      fullPath: '/student/dashboard'
+      preLoaderRoute: typeof StudentDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student/carryovers': {
+      id: '/student/carryovers'
+      path: '/student/carryovers'
+      fullPath: '/student/carryovers'
+      preLoaderRoute: typeof StudentCarryoversRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faculty/transcripts': {
@@ -517,8 +597,12 @@ const rootRouteChildren: RootRouteChildren = {
   FacultyResultsRoute: FacultyResultsRoute,
   FacultyStudentsRoute: FacultyStudentsRoute,
   FacultyTranscriptsRoute: FacultyTranscriptsRoute,
+  StudentCarryoversRoute: StudentCarryoversRoute,
+  StudentDashboardRoute: StudentDashboardRoute,
   StudentLoginRoute: StudentLoginRoute,
+  StudentProfileRoute: StudentProfileRoute,
   StudentRegisterRoute: StudentRegisterRoute,
+  StudentResultsRoute: StudentResultsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
