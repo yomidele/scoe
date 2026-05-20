@@ -56,6 +56,30 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 </Link>
               );
             })}
+            {isSuperAdmin && (
+              <>
+                <div className="hidden md:block md:px-2 md:pt-3 md:pb-1 md:text-[10px] md:font-semibold md:uppercase md:tracking-wider md:text-muted-foreground">
+                  Super Admin
+                </div>
+                {SUPER_ADMIN_NAV.map(({ to, label, icon: Icon }) => {
+                  const active = location.pathname === to;
+                  return (
+                    <Link
+                      key={to}
+                      to={to}
+                      className={`flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="whitespace-nowrap">{label}</span>
+                    </Link>
+                  );
+                })}
+              </>
+            )}
             <div className="md:mt-auto md:pt-2">
               <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" /> Sign out
