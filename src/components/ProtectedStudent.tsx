@@ -13,7 +13,7 @@ export function ProtectedStudent({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading || roleLoading) return;
     if (!session) navigate({ to: "/student/login" });
-    else if (!isStudent) navigate({ to: "/student/login" });
+    else if (!isStudent) navigate({ to: "/" });
   }, [loading, roleLoading, session, isStudent, navigate]);
 
   if (loading || roleLoading || !session || !isStudent) {
