@@ -181,10 +181,12 @@ function DepartmentsCard({
 
   const createDept = useMutation({
     mutationFn: async () => {
+      const cleanCode = code.trim().toUpperCase();
+      if (!/^[A-Z]{2}$/.test(cleanCode)) throw new Error("Code must be exactly 2 letters");
       const { error } = await supabase.from("departments").insert({
         faculty_id: facultyId,
         name: name.trim(),
-        code: code.trim().toUpperCase(),
+        code: cleanCode,
       });
       if (error) throw error;
     },
