@@ -6,47 +6,39 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { ensureDemoAdmin } from "@/server/seed-admin";
 import { useAuthSession } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Super Admin Sign in — SCOE" }] }),
-  component: LoginPage,
+export const Route = createFileRoute("/student/login")({
+  head: () => ({ meta: [{ title: "Student Sign In — SCOE" }] }),
+  component: StudentLoginPage,
 });
 
-const DEMO_EMAIL = "admin@tsu.demo";
-const DEMO_PASSWORD = "demo1234";
-
-function LoginPage() {
+function StudentLoginPage() {
   const navigate = useNavigate();
   const { session } = useAuthSession();
-  const [email, setEmail] = useState(DEMO_EMAIL);
-  const [password, setPassword] = useState(DEMO_PASSWORD);
+  const [matric, setMatric] = useState("");
+  const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (session) navigate({ to: "/dashboard" });
   }, [session, navigate]);
 
-  // Ensure demo admin exists on page load
-  useEffect(() => {
-    ensureDemoAdmin().catch((e) => console.error("seed admin failed", e));
-  }, []);
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      // Attempt to seed (idempotent) before signing in to handle first-ever load
-      await ensureDemoAdmin();
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      // Phase 1 placeholder: students sign in with email derived from matric.
+      // Phase 4 wires up real student registration + matric→email resolver.
+      const derivedEmail = `${matric.trim().toLowerCase().replace(/[^a-z0-9]/g, "")}@students.scoe.local`;
+      const { error } = await supabase.auth.signInWithPassword({ email: derivedEmail, password });
       if (error) {
-        toast.error(error.message);
+        toast.error("Student portal is not yet open. Registration will be available soon.");
         return;
       }
-      toast.success("Welcome back, Admin");
+      toast.success("Welcome back");
       navigate({ to: "/dashboard" });
     } finally {
       setSubmitting(false);
@@ -59,14 +51,14 @@ function LoginPage() {
       <div className="flex flex-1 items-center justify-center px-4 py-10">
         <Card className="w-full max-w-md tsu-shadow">
           <CardHeader>
-            <CardTitle className="font-serif text-2xl">Super Admin Sign In</CardTitle>
-            <CardDescription>University-wide administrator portal. Demo credentials are pre-filled.</CardDescription>
+            <CardTitle className="font-serif text-2xl">Student Sign In</CardTitle>
+            <CardDescription>Enter your matric number and password to access your portal.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignIn} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <Label htmlFor="matric">Matric Number</Label>
+                <Input id="matric" value={matric} onChange={(e) => setMatric(e.target.value)} placeholder="CSC/2026/00124" required />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
@@ -75,12 +67,9 @@ function LoginPage() {
               <Button type="submit" className="w-full" disabled={submitting}>
                 {submitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Signing in…</> : "Sign In"}
               </Button>
-              <p className="rounded-md bg-secondary p-3 text-xs text-secondary-foreground">
-                <strong>Demo account:</strong> {DEMO_EMAIL} / {DEMO_PASSWORD}
-              </p>
               <div className="flex justify-between text-xs text-muted-foreground">
                 <Link to="/faculty/login" className="hover:underline">Faculty Admin →</Link>
-                <Link to="/student/login" className="hover:underline">Student →</Link>
+                <Link to="/login" className="hover:underline">Super Admin →</Link>
               </div>
             </form>
           </CardContent>
