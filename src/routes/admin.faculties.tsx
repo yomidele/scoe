@@ -181,10 +181,12 @@ function DepartmentsCard({
 
   const createDept = useMutation({
     mutationFn: async () => {
+      const cleanCode = code.trim().toUpperCase();
+      if (!/^[A-Z]{2}$/.test(cleanCode)) throw new Error("Code must be exactly 2 letters");
       const { error } = await supabase.from("departments").insert({
         faculty_id: facultyId,
         name: name.trim(),
-        code: code.trim().toUpperCase(),
+        code: cleanCode,
       });
       if (error) throw error;
     },
@@ -240,8 +242,15 @@ function DepartmentsCard({
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Computer Science" required />
           </div>
           <div>
-            <Label>Code</Label>
-            <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="CSC" required />
+            <Label>Code (2 letters)</Label>
+            <Input
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/[^A-Za-z]/g, "").slice(0, 2).toUpperCase())}
+              placeholder="CS"
+              maxLength={2}
+              pattern="[A-Za-z]{2}"
+              required
+            />
           </div>
           <div className="flex items-end">
             <Button type="submit" disabled={createDept.isPending} className="w-full md:w-auto">
