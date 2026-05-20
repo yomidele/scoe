@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuthSession } from "@/hooks/use-auth";
+import { useRole } from "@/hooks/use-role";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { resolveMatricToEmail } from "@/lib/student-registration.functions";
@@ -20,14 +21,16 @@ export const Route = createFileRoute("/student/login")({
 function StudentLoginPage() {
   const navigate = useNavigate();
   const { session } = useAuthSession();
+  const { isStudent, loading: roleLoading } = useRole();
   const [matric, setMatric] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const resolve = useServerFn(resolveMatricToEmail);
 
   useEffect(() => {
-    if (session) navigate({ to: "/student/dashboard" });
-  }, [session, navigate]);
+    if (!session || roleLoading) return;
+    if (isStudent) navigate({ to: "/student/dashboard" });
+  }, [session, roleLoading, isStudent, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
