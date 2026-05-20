@@ -1,9 +1,10 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { TSUHeader } from "./TSUHeader";
-import { LayoutDashboard, CalendarDays, BookOpen, Users, ClipboardEdit, FileSpreadsheet, FileText, LogOut } from "lucide-react";
+import { LayoutDashboard, CalendarDays, BookOpen, Users, ClipboardEdit, FileSpreadsheet, FileText, LogOut, Building2, Shield, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useRole } from "@/hooks/use-role";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -13,6 +14,12 @@ const NAV = [
   { to: "/result-entry", label: "Result Entry", icon: ClipboardEdit },
   { to: "/results", label: "View / Export Results", icon: FileSpreadsheet },
   { to: "/transcripts", label: "Transcripts", icon: FileText },
+] as const;
+
+const SUPER_ADMIN_NAV = [
+  { to: "/admin/faculties", label: "Faculties", icon: Building2 },
+  { to: "/admin/faculty-admins", label: "Faculty Admins", icon: Shield },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
 ] as const;
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
