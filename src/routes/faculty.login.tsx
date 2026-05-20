@@ -23,7 +23,7 @@ function FacultyLoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (session) navigate({ to: "/dashboard" });
+    if (session) navigate({ to: "/faculty/dashboard" });
   }, [session, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -36,7 +36,7 @@ function FacultyLoginPage() {
         return;
       }
       toast.success("Welcome, Faculty Admin");
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/faculty/dashboard" });
     } finally {
       setSubmitting(false);
     }
