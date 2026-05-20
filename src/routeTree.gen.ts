@@ -20,6 +20,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as AuditLogsRouteImport } from './routes/audit-logs'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FacultyLoginRouteImport } from './routes/faculty.login'
 
 const ValidationAuditRoute = ValidationAuditRouteImport.update({
   id: '/validation-audit',
@@ -76,6 +77,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FacultyLoginRoute = FacultyLoginRouteImport.update({
+  id: '/faculty/login',
+  path: '/faculty/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
   '/validation-audit': typeof ValidationAuditRoute
+  '/faculty/login': typeof FacultyLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
   '/validation-audit': typeof ValidationAuditRoute
+  '/faculty/login': typeof FacultyLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/students': typeof StudentsRoute
   '/transcripts': typeof TranscriptsRoute
   '/validation-audit': typeof ValidationAuditRoute
+  '/faculty/login': typeof FacultyLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/students'
     | '/transcripts'
     | '/validation-audit'
+    | '/faculty/login'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/students'
     | '/transcripts'
     | '/validation-audit'
+    | '/faculty/login'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/students'
     | '/transcripts'
     | '/validation-audit'
+    | '/faculty/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +183,7 @@ export interface RootRouteChildren {
   StudentsRoute: typeof StudentsRoute
   TranscriptsRoute: typeof TranscriptsRoute
   ValidationAuditRoute: typeof ValidationAuditRoute
+  FacultyLoginRoute: typeof FacultyLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -252,6 +265,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faculty/login': {
+      id: '/faculty/login'
+      path: '/faculty/login'
+      fullPath: '/faculty/login'
+      preLoaderRoute: typeof FacultyLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -267,7 +287,17 @@ const rootRouteChildren: RootRouteChildren = {
   StudentsRoute: StudentsRoute,
   TranscriptsRoute: TranscriptsRoute,
   ValidationAuditRoute: ValidationAuditRoute,
+  FacultyLoginRoute: FacultyLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
