@@ -28,40 +28,48 @@ export const createFacultyAdmin = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertSuperAdmin(context.userId);
+    try {
+      await assertSuperAdmin(context.userId);
 
-    const { data: created, error: signUpError } = await supabaseAdmin.auth.admin.createUser({
-      email: data.email,
-      password: data.password,
-      email_confirm: true,
-      user_metadata: { full_name: data.full_name },
-    });
-    if (signUpError || !created.user) throw new Error(signUpError?.message ?? "Failed to create user");
+      const { data: created, error: signUpError } = await supabaseAdmin.auth.admin.createUser({
+        email: data.email,
+        password: data.password,
+        email_confirm: true,
+        user_metadata: { full_name: data.full_name },
+      });
+      if (signUpError || !created?.user) {
+        throw new Error(signUpError?.message ?? "Failed to create user");
+      }
 
-    const userId = created.user.id;
+      const userId = created.user.id;
 
-    const { error: roleError } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: userId, role: "faculty_admin" });
-    if (roleError) {
-      await supabaseAdmin.auth.admin.deleteUser(userId);
-      throw new Error(roleError.message);
+      const { error: roleError } = await supabaseAdmin
+        .from("user_roles")
+        .insert({ user_id: userId, role: "faculty_admin" });
+      if (roleError) {
+        await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {});
+        throw new Error(`Role assignment failed: ${roleError.message}`);
+      }
+
+      const { error: adminError } = await supabaseAdmin.from("faculty_admins").insert({
+        user_id: userId,
+        faculty_id: data.faculty_id,
+        full_name: data.full_name,
+        email: data.email,
+        phone: data.phone ?? null,
+      });
+      if (adminError) {
+        await supabaseAdmin.from("user_roles").delete().eq("user_id", userId).catch(() => {});
+        await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {});
+        throw new Error(`Faculty admin insert failed: ${adminError.message}`);
+      }
+
+      return { user_id: userId };
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error("createFacultyAdmin failed:", msg);
+      throw new Error(msg);
     }
-
-    const { error: adminError } = await supabaseAdmin.from("faculty_admins").insert({
-      user_id: userId,
-      faculty_id: data.faculty_id,
-      full_name: data.full_name,
-      email: data.email,
-      phone: data.phone ?? null,
-    });
-    if (adminError) {
-      await supabaseAdmin.from("user_roles").delete().eq("user_id", userId);
-      await supabaseAdmin.auth.admin.deleteUser(userId);
-      throw new Error(adminError.message);
-    }
-
-    return { user_id: userId };
   });
 
 export const deleteFacultyAdmin = createServerFn({ method: "POST" })
