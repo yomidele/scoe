@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { TSUHeader } from "./TSUHeader";
-import { LayoutDashboard, CalendarDays, BookOpen, Users, ClipboardEdit, FileSpreadsheet, FileText, LogOut, Building2, Shield, BarChart3 } from "lucide-react";
+import { LayoutDashboard, CalendarDays, BookOpen, Users, ClipboardEdit, FileSpreadsheet, FileText, LogOut, Building2, Shield, BarChart3, LinkIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ const NAV = [
 const SUPER_ADMIN_NAV = [
   { to: "/admin/faculties", label: "Faculties", icon: Building2 },
   { to: "/admin/faculty-admins", label: "Faculty Admins", icon: Shield },
+  { to: "/admin/registration-links", label: "Registration Links", icon: LinkIcon },
   { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
 ] as const;
 
