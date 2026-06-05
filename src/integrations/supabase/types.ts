@@ -142,6 +142,47 @@ export type Database = {
           },
         ]
       }
+      course_assignments: {
+        Row: {
+          course_id: string
+          created_at: string
+          department_id: string
+          faculty_id: string
+          id: string
+          lecturer_id: string
+          semester: string
+          session_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          department_id: string
+          faculty_id: string
+          id?: string
+          lecturer_id: string
+          semester: string
+          session_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          department_id?: string
+          faculty_id?: string
+          id?: string
+          lecturer_id?: string
+          semester?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_assignments_lecturer_id_fkey"
+            columns: ["lecturer_id"]
+            isOneToOne: false
+            referencedRelation: "lecturers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_registration_items: {
         Row: {
           carryover_id: string | null
@@ -312,6 +353,42 @@ export type Database = {
           },
         ]
       }
+      department_admins: {
+        Row: {
+          created_at: string
+          department_id: string
+          email: string
+          faculty_id: string
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          department_id: string
+          email: string
+          faculty_id: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          department_id?: string
+          email?: string
+          faculty_id?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           code: string
@@ -412,6 +489,42 @@ export type Database = {
           },
         ]
       }
+      lecturers: {
+        Row: {
+          created_at: string
+          department_id: string
+          email: string
+          faculty_id: string
+          full_name: string
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          department_id: string
+          email: string
+          faculty_id: string
+          full_name: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          department_id?: string
+          email?: string
+          faculty_id?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       matric_sequences: {
         Row: {
           department_id: string
@@ -471,47 +584,65 @@ export type Database = {
       }
       results: {
         Row: {
+          approved_at: string | null
           ca_score: number
           course_id: string
           created_at: string
           department_id: string | null
+          entered_by: string | null
           exam_score: number
           faculty_id: string
           id: string
           level: number
+          published_at: string | null
+          returned_reason: string | null
           semester: string
           session_id: string
+          status: string
           student_id: string
+          submitted_at: string | null
           total_score: number | null
           updated_at: string
         }
         Insert: {
+          approved_at?: string | null
           ca_score?: number
           course_id: string
           created_at?: string
           department_id?: string | null
+          entered_by?: string | null
           exam_score?: number
           faculty_id?: string
           id?: string
           level: number
+          published_at?: string | null
+          returned_reason?: string | null
           semester: string
           session_id: string
+          status?: string
           student_id: string
+          submitted_at?: string | null
           total_score?: number | null
           updated_at?: string
         }
         Update: {
+          approved_at?: string | null
           ca_score?: number
           course_id?: string
           created_at?: string
           department_id?: string | null
+          entered_by?: string | null
           exam_score?: number
           faculty_id?: string
           id?: string
           level?: number
+          published_at?: string | null
+          returned_reason?: string | null
           semester?: string
           session_id?: string
+          status?: string
           student_id?: string
+          submitted_at?: string | null
           total_score?: number | null
           updated_at?: string
         }
@@ -719,7 +850,12 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "super_admin" | "faculty_admin" | "student"
+      app_role:
+        | "super_admin"
+        | "faculty_admin"
+        | "student"
+        | "department_admin"
+        | "lecturer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -847,7 +983,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "faculty_admin", "student"],
+      app_role: [
+        "super_admin",
+        "faculty_admin",
+        "student",
+        "department_admin",
+        "lecturer",
+      ],
     },
   },
 } as const
