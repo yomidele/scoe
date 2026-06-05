@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { TSUHeader } from "./TSUHeader";
-import { LayoutDashboard, BookOpen, Users, ClipboardEdit, FileSpreadsheet, FileText, LogOut, AlertTriangle, LinkIcon } from "lucide-react";
+import { LayoutDashboard, BookOpen, Users, ClipboardEdit, FileSpreadsheet, FileText, LogOut, AlertTriangle, LinkIcon, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ const NAV = [
   { to: "/faculty/dashboard", label: "Faculty Dashboard", icon: LayoutDashboard },
   { to: "/faculty/courses", label: "Courses", icon: BookOpen },
   { to: "/faculty/students", label: "Students", icon: Users },
+  { to: "/faculty/dept-admins", label: "Department Admins", icon: UserCog },
   { to: "/faculty/result-entry", label: "Result Entry", icon: ClipboardEdit },
   { to: "/faculty/results", label: "View / Export Results", icon: FileSpreadsheet },
   { to: "/faculty/transcripts", label: "Transcripts", icon: FileText },
