@@ -61,7 +61,7 @@ export const createDepartmentAdmin = createServerFn({ method: "POST" })
         full_name: data.full_name, email: data.email, phone: data.phone ?? null,
       });
       if (insErr) {
-        await supabaseAdmin.from("user_roles").delete().eq("user_id", userId).catch(() => {});
+        try { await supabaseAdmin.from("user_roles").delete().eq("user_id", userId); } catch {}
         await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {});
         throw new Error(`Department admin insert failed: ${insErr.message}`);
       }
@@ -132,7 +132,7 @@ export const createLecturer = createServerFn({ method: "POST" })
         full_name: data.full_name, email: data.email, phone: data.phone ?? null,
       });
       if (insErr) {
-        await supabaseAdmin.from("user_roles").delete().eq("user_id", userId).catch(() => {});
+        try { await supabaseAdmin.from("user_roles").delete().eq("user_id", userId); } catch {}
         await supabaseAdmin.auth.admin.deleteUser(userId).catch(() => {});
         throw new Error(`Lecturer insert failed: ${insErr.message}`);
       }
