@@ -43,10 +43,11 @@ function LinksPage() {
     queryFn: async () => (await supabase.from("departments").select("*").eq("faculty_id", facultyInfo!.faculty_id).order("name")).data ?? [],
   });
 
-  const { data: links = [], refetch } = useQuery({
+  const { data: linksRaw, refetch } = useQuery({
     queryKey: ["reg-links"],
     queryFn: () => list(),
   });
+  const links = Array.isArray(linksRaw) ? linksRaw : [];
 
   const createMut = useMutation({
     mutationFn: async () => {
