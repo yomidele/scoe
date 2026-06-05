@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { TSUHeader } from "@/components/TSUHeader";
@@ -11,7 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Upload, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import { validateRegistrationToken, registerStudentWithToken } from "@/lib/student-registration.functions";
+import {
+  validateRegistrationToken,
+  registerStudentWithToken,
+  listFacultiesAndDepartments,
+} from "@/lib/student-registration.functions";
 
 const searchSchema = z.object({ token: z.string().optional() });
 
@@ -21,15 +25,26 @@ export const Route = createFileRoute("/student/register")({
   component: StudentRegisterPage,
 });
 
+type Faculty = { id: string; name: string; code: string | null };
+type Department = { id: string; name: string; code: string | null; faculty_id: string };
+
 function StudentRegisterPage() {
   const { token } = useSearch({ from: "/student/register" });
   const navigate = useNavigate();
   const validate = useServerFn(validateRegistrationToken);
   const register = useServerFn(registerStudentWithToken);
+  const listOpts = useServerFn(listFacultiesAndDepartments);
 
   const [loadingToken, setLoadingToken] = useState(true);
-  const [tokenInfo, setTokenInfo] = useState<{ faculty_name: string; department_name: string; level: number } | null>(null);
+  const [linkLabel, setLinkLabel] = useState<string | null>(null);
   const [tokenError, setTokenError] = useState<string | null>(null);
+
+  const [faculties, setFaculties] = useState<Faculty[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+
+  const [facultyId, setFacultyId] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
+  const [level, setLevel] = useState("100");
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -45,20 +60,30 @@ function StudentRegisterPage() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<{ matric: string; email: string } | null>(null);
 
+  const filteredDepartments = useMemo(
+    () => departments.filter((d) => d.faculty_id === facultyId),
+    [departments, facultyId],
+  );
+
   useEffect(() => {
     if (!token) {
-      setTokenError("This page requires a valid registration link from your faculty.");
+      setTokenError("This page requires a valid registration link.");
       setLoadingToken(false);
       return;
     }
-    validate({ data: { token } })
-      .then((res) => {
-        if (res.valid) setTokenInfo({ faculty_name: res.link.faculty_name, department_name: res.link.department_name, level: res.link.level });
-        else setTokenError(res.reason);
+    Promise.all([validate({ data: { token } }), listOpts()])
+      .then(([res, opts]) => {
+        if (res.valid) {
+          setLinkLabel(res.link.label ?? null);
+          setFaculties(opts.faculties);
+          setDepartments(opts.departments);
+        } else {
+          setTokenError(res.reason);
+        }
       })
-      .catch((e) => setTokenError(e.message))
+      .catch((e) => setTokenError((e as Error).message))
       .finally(() => setLoadingToken(false));
-  }, [token, validate]);
+  }, [token, validate, listOpts]);
 
   const handlePassport = (file: File) => {
     if (file.size > 2 * 1024 * 1024) {
@@ -73,11 +98,18 @@ function StudentRegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
+    if (!facultyId || !departmentId) {
+      toast.error("Please select your faculty and department");
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await register({
         data: {
           token,
+          faculty_id: facultyId,
+          department_id: departmentId,
+          level: Number(level),
           full_name: fullName,
           email,
           password,
@@ -144,7 +176,7 @@ function StudentRegisterPage() {
               <CardDescription>{tokenError}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">Please contact your Faculty Admin for a new registration link.</p>
+              <p className="text-sm text-muted-foreground">Please contact the Registrar for a new registration link.</p>
               <Link to="/student/login" className="mt-4 inline-block text-sm text-primary underline">Already registered? Sign in →</Link>
             </CardContent>
           </Card>
@@ -161,7 +193,7 @@ function StudentRegisterPage() {
           <CardHeader>
             <CardTitle className="font-serif text-2xl">Student Registration</CardTitle>
             <CardDescription>
-              {tokenInfo?.faculty_name} • {tokenInfo?.department_name} • {tokenInfo?.level} Level
+              {linkLabel ? `${linkLabel} • ` : ""}Fill in your details. After saving, your record will be filed under the faculty and department you select.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -183,6 +215,30 @@ function StudentRegisterPage() {
                     onChange={(e) => e.target.files?.[0] && handlePassport(e.target.files[0])}
                   />
                 </Label>
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="space-y-1.5">
+                  <Label>Faculty *</Label>
+                  <Select value={facultyId} onValueChange={(v) => { setFacultyId(v); setDepartmentId(""); }}>
+                    <SelectTrigger><SelectValue placeholder="Select faculty" /></SelectTrigger>
+                    <SelectContent>{faculties.map((f) => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Department *</Label>
+                  <Select value={departmentId} onValueChange={setDepartmentId} disabled={!facultyId}>
+                    <SelectTrigger><SelectValue placeholder={facultyId ? "Select department" : "Pick faculty first"} /></SelectTrigger>
+                    <SelectContent>{filteredDepartments.map((d) => <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Level *</Label>
+                  <Select value={level} onValueChange={setLevel}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{[100,200,300,400,500].map((l) => <SelectItem key={l} value={String(l)}>{l}</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">

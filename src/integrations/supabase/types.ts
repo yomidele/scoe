@@ -547,36 +547,45 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string | null
-          department_id: string
+          department_id: string | null
           expires_at: string
-          faculty_id: string
+          faculty_id: string | null
           id: string
-          level: number
+          label: string | null
+          level: number | null
+          max_uses: number | null
           token: string
+          use_count: number
           used_at: string | null
           used_by: string | null
         }
         Insert: {
           created_at?: string
           created_by?: string | null
-          department_id: string
+          department_id?: string | null
           expires_at?: string
-          faculty_id: string
+          faculty_id?: string | null
           id?: string
-          level?: number
+          label?: string | null
+          level?: number | null
+          max_uses?: number | null
           token?: string
+          use_count?: number
           used_at?: string | null
           used_by?: string | null
         }
         Update: {
           created_at?: string
           created_by?: string | null
-          department_id?: string
+          department_id?: string | null
           expires_at?: string
-          faculty_id?: string
+          faculty_id?: string | null
           id?: string
-          level?: number
+          label?: string | null
+          level?: number | null
+          max_uses?: number | null
           token?: string
+          use_count?: number
           used_at?: string | null
           used_by?: string | null
         }
@@ -843,6 +852,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      next_matric_seq: {
+        Args: { _department_id: string; _year_code: string }
+        Returns: number
       }
       promote_students_to_session: {
         Args: { new_session_id: string }
