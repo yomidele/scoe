@@ -2,40 +2,43 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-// Public: validate a registration token and return faculty/department/level info.
+// Public: validate a registration token. General links: no faculty/department/level baked in.
 export const validateRegistrationToken = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => z.object({ token: z.string().uuid() }).parse(input))
   .handler(async ({ data }) => {
     const { data: link, error } = await supabaseAdmin
       .from("registration_links")
-      .select("id, token, faculty_id, department_id, level, expires_at, used_at, faculties:faculty_id(name, code), departments:department_id(name, code)")
+      .select("id, token, expires_at, use_count, max_uses, label")
       .eq("token", data.token)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!link) return { valid: false as const, reason: "Invalid token" };
-    if (link.used_at) return { valid: false as const, reason: "This link has already been used" };
     if (new Date(link.expires_at) < new Date()) return { valid: false as const, reason: "This link has expired" };
-    return {
-      valid: true as const,
-      link: {
-        id: link.id,
-        faculty_id: link.faculty_id,
-        department_id: link.department_id,
-        level: link.level,
-        faculty_name: (link.faculties as { name?: string } | null)?.name ?? "",
-        faculty_code: (link.faculties as { code?: string } | null)?.code ?? "",
-        department_name: (link.departments as { name?: string } | null)?.name ?? "",
-        department_code: (link.departments as { code?: string } | null)?.code ?? "DEPT",
-      },
-    };
+    if (link.max_uses !== null && link.use_count >= link.max_uses) {
+      return { valid: false as const, reason: "This link has reached its maximum number of uses" };
+    }
+    return { valid: true as const, link: { id: link.id, label: link.label ?? null } };
   });
 
-// Public: register a new student using a valid token. Creates auth user + student row + role + matric number.
+// Public: list faculties + departments so the student can pick them.
+export const listFacultiesAndDepartments = createServerFn({ method: "POST" })
+  .handler(async () => {
+    const [{ data: faculties }, { data: departments }] = await Promise.all([
+      supabaseAdmin.from("faculties").select("id, name, code").order("name"),
+      supabaseAdmin.from("departments").select("id, name, code, faculty_id").order("name"),
+    ]);
+    return { faculties: faculties ?? [], departments: departments ?? [] };
+  });
+
+// Public: register student. Student chooses faculty/department/level themselves.
 export const registerStudentWithToken = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
       .object({
         token: z.string().uuid(),
+        faculty_id: z.string().uuid(),
+        department_id: z.string().uuid(),
+        level: z.number().int().min(100).max(600),
         full_name: z.string().min(2).max(120),
         email: z.string().email(),
         password: z.string().min(8).max(128),
@@ -51,36 +54,41 @@ export const registerStudentWithToken = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    // 1. Validate token
+    // 1. Validate link
     const { data: link, error: linkErr } = await supabaseAdmin
       .from("registration_links")
-      .select("*, departments:department_id(code)")
+      .select("id, expires_at, use_count, max_uses")
       .eq("token", data.token)
       .maybeSingle();
     if (linkErr) throw new Error(linkErr.message);
-    if (!link || link.used_at || new Date(link.expires_at) < new Date()) {
-      throw new Error("Registration link is invalid or expired");
+    if (!link) throw new Error("Invalid registration link");
+    if (new Date(link.expires_at) < new Date()) throw new Error("Registration link has expired");
+    if (link.max_uses !== null && link.use_count >= link.max_uses) {
+      throw new Error("Registration link has reached its maximum number of uses");
     }
 
-    // 2. Generate matric number: {DEPT_CODE}/{YY}/{4digit}
-    const deptCode = (link.departments as { code?: string } | null)?.code?.toUpperCase() || "DEPT";
-    const yearCode = String(new Date().getFullYear()).slice(-2);
-    // Atomic upsert + increment
-    const { data: seqRow, error: seqErr } = await supabaseAdmin
-      .from("matric_sequences")
-      .select("last_seq")
-      .eq("department_id", link.department_id)
-      .eq("year_code", yearCode)
+    // 2. Verify faculty + department pair belongs together
+    const { data: dept, error: deptErr } = await supabaseAdmin
+      .from("departments")
+      .select("id, code, faculty_id")
+      .eq("id", data.department_id)
       .maybeSingle();
-    if (seqErr) throw new Error(seqErr.message);
-    const nextSeq = (seqRow?.last_seq ?? 0) + 1;
-    const { error: upErr } = await supabaseAdmin
-      .from("matric_sequences")
-      .upsert({ department_id: link.department_id, year_code: yearCode, last_seq: nextSeq });
-    if (upErr) throw new Error(upErr.message);
-    const matric = `${deptCode}/${yearCode}/${String(nextSeq).padStart(4, "0")}`;
+    if (deptErr) throw new Error(deptErr.message);
+    if (!dept || dept.faculty_id !== data.faculty_id) {
+      throw new Error("Selected department does not belong to the selected faculty");
+    }
 
-    // 3. Create auth user
+    // 3. Reserve matric sequence atomically
+    const yearCode = String(new Date().getFullYear()).slice(-2);
+    const deptCode = (dept.code ?? "DEPT").toUpperCase();
+    const { data: seq, error: seqErr } = await supabaseAdmin.rpc("next_matric_seq", {
+      _department_id: data.department_id,
+      _year_code: yearCode,
+    });
+    if (seqErr || typeof seq !== "number") throw new Error(seqErr?.message ?? "Could not allocate matric number");
+    const matric = `${deptCode}/${yearCode}/${String(seq).padStart(4, "0")}`;
+
+    // 4. Create auth user
     const { data: created, error: signUpErr } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
       password: data.password,
@@ -90,7 +98,7 @@ export const registerStudentWithToken = createServerFn({ method: "POST" })
     if (signUpErr || !created.user) throw new Error(signUpErr?.message ?? "Failed to create account");
     const userId = created.user.id;
 
-    // 4. Upload passport if provided
+    // 5. Upload passport if provided
     let passportUrl: string | null = null;
     if (data.passport_base64) {
       try {
@@ -109,16 +117,16 @@ export const registerStudentWithToken = createServerFn({ method: "POST" })
       }
     }
 
-    // 5. Insert student row
-    const { error: studentErr } = await supabaseAdmin.from("students").insert({
+    // 6. Insert student row
+    const studentRow = {
       user_id: userId,
       matric_number: matric,
       full_name: data.full_name,
       email: data.email,
       phone: data.phone ?? null,
-      level: link.level,
-      faculty_id: link.faculty_id,
-      department_id: link.department_id,
+      level: data.level,
+      faculty_id: data.faculty_id,
+      department_id: data.department_id,
       gender: data.gender ?? null,
       date_of_birth: data.date_of_birth ?? null,
       address: data.address ?? null,
@@ -126,19 +134,20 @@ export const registerStudentWithToken = createServerFn({ method: "POST" })
       guardian_name: data.guardian_name ?? null,
       guardian_phone: data.guardian_phone ?? null,
       passport_url: passportUrl,
-    });
+    };
+    const { error: studentErr } = await supabaseAdmin.from("students").insert(studentRow as never);
     if (studentErr) {
       await supabaseAdmin.auth.admin.deleteUser(userId);
       throw new Error(studentErr.message);
     }
 
-    // 6. Assign student role
+    // 7. Assign student role
     await supabaseAdmin.from("user_roles").insert({ user_id: userId, role: "student" });
 
-    // 7. Mark link used
+    // 8. Increment use count
     await supabaseAdmin
       .from("registration_links")
-      .update({ used_at: new Date().toISOString(), used_by: userId })
+      .update({ use_count: link.use_count + 1, used_at: new Date().toISOString(), used_by: userId })
       .eq("id", link.id);
 
     return { ok: true as const, matric_number: matric, email: data.email };
