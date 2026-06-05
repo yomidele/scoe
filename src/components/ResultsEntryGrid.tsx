@@ -265,6 +265,8 @@ export function ResultsEntryGrid() {
               level: item.level,
               ca_score: item.ca_score,
               exam_score: item.exam_score,
+              status: "published",
+              published_at: new Date().toISOString(),
             },
             {
               onConflict: "student_id,course_id,session_id,semester",
