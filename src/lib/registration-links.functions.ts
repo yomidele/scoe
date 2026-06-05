@@ -34,7 +34,7 @@ export const createRegistrationLink = createServerFn({ method: "POST" })
         label: data.label ?? null,
         created_by: context.userId,
       })
-      .select("id, token, expires_at")
+      .select("id, token, expires_at, used_at, created_at, use_count, max_uses, label")
       .single();
     if (error) throw new Error(error.message);
     return link;

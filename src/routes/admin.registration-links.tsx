@@ -40,7 +40,13 @@ function AdminLinksPage() {
         label: label || null,
       },
     }),
-    onSuccess: () => { toast.success("Link created"); qc.invalidateQueries({ queryKey: ["reg-links-all"] }); setLabel(""); setMaxUses(""); },
+    onSuccess: (newLink) => {
+      toast.success("Link created");
+      qc.setQueryData(["reg-links-all"], (old: unknown) => [newLink, ...(Array.isArray(old) ? old : [])]);
+      qc.invalidateQueries({ queryKey: ["reg-links-all"] });
+      setLabel("");
+      setMaxUses("");
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
