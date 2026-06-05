@@ -853,6 +853,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      next_matric_seq: {
+        Args: { _department_id: string; _year_code: string }
+        Returns: number
+      }
       promote_students_to_session: {
         Args: { new_session_id: string }
         Returns: undefined
