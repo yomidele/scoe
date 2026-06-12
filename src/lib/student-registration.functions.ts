@@ -67,26 +67,36 @@ export const registerStudentWithToken = createServerFn({ method: "POST" })
       throw new Error("Registration link has reached its maximum number of uses");
     }
 
-    // 2. Verify faculty + department pair belongs together
-    const { data: dept, error: deptErr } = await supabaseAdmin
-      .from("departments")
-      .select("id, code, faculty_id")
-      .eq("id", data.department_id)
-      .maybeSingle();
+    // 2. Verify faculty + department pair belongs together (and load faculty code for matric)
+    const [{ data: dept, error: deptErr }, { data: fac, error: facErr }] = await Promise.all([
+      supabaseAdmin
+        .from("departments")
+        .select("id, code, faculty_id")
+        .eq("id", data.department_id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("faculties")
+        .select("id, code")
+        .eq("id", data.faculty_id)
+        .maybeSingle(),
+    ]);
     if (deptErr) throw new Error(deptErr.message);
+    if (facErr) throw new Error(facErr.message);
     if (!dept || dept.faculty_id !== data.faculty_id) {
       throw new Error("Selected department does not belong to the selected faculty");
     }
+    if (!fac) throw new Error("Faculty not found");
 
-    // 3. Reserve matric sequence atomically
+    // 3. Reserve matric sequence atomically — format: TSU/<FAC>/<DEPT>/<YY>/<NNNN>
     const yearCode = String(new Date().getFullYear()).slice(-2);
+    const facCode = (fac.code ?? "FAC").toUpperCase();
     const deptCode = (dept.code ?? "DEPT").toUpperCase();
     const { data: seq, error: seqErr } = await supabaseAdmin.rpc("next_matric_seq", {
       _department_id: data.department_id,
       _year_code: yearCode,
     });
     if (seqErr || typeof seq !== "number") throw new Error(seqErr?.message ?? "Could not allocate matric number");
-    const matric = `${deptCode}/${yearCode}/${String(seq).padStart(4, "0")}`;
+    const matric = `TSU/${facCode}/${deptCode}/${yearCode}/${String(seq).padStart(4, "0")}`;
 
     // 4. Create auth user
     const { data: created, error: signUpErr } = await supabaseAdmin.auth.admin.createUser({
