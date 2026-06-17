@@ -5,4 +5,4 @@ cmds = ["npm install"]
 cmds = ["npm run build"]
 
 [start]
-cmd = "node .output/server/index.mms"
+cmd = "node .output/server/index.mjs"
